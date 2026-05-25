@@ -99,8 +99,8 @@ const context = vm.createContext(sandbox);
 try {
   // Đọc các file logic lõi của dự án
   const dataCode = fs.readFileSync('js/data.js', 'utf8');
-  const nlpCode = fs.readFileSync('js/nlp.js', 'utf8');
-  const chatbotCode = fs.readFileSync('js/chatbot.js', 'utf8');
+  const nlpCode = fs.readFileSync('js/services/nlp.js', 'utf8');
+  const chatbotCode = fs.readFileSync('js/services/chatbot.js', 'utf8');
   
   // Nạp vào Sandbox
   vm.runInContext(dataCode + '\nthis.DB = DB;', context);

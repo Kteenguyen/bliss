@@ -1,0 +1,10 @@
+{
+  "name": "bliss-homestay-ai",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "node start.js"
+  },
+  "dependencies": {
+    "docx": "^9.7.0"
+  }
+}

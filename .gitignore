@@ -1,0 +1,23 @@
+# Dependencies
+node_modules/
+antigravity-skills/
+
+# Local databases & credentials (CRITICAL FOR SECURITY)
+server-db.json
+server-db-backup.json
+
+# Build & lock files
+package-lock.json
+
+# Logs & temp files
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# AI Agent & IDE configs
+.agent/
+.gemini/
+.vscode/
+.idea/
+.DS_Store

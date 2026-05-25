@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bliss AI Hub — Homestay Workflow Automation</title>
+  <meta name="description" content="Hệ thống tự động hóa luồng công việc và AI Chatbot cho Bliss Homestay. Quản lý đặt phòng, chatbot thông minh, automation 24/7." />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+<div id="app">
+
+  <!-- ═══════════════ SIDEBAR ═══════════════ -->
+  <nav id="sidebar">
+    <div class="sidebar-logo">
+      <a class="logo-mark">
+        <div class="logo-icon">🏡</div>
+        <div>
+          <div class="logo-text">Bliss <span>AI Hub</span></div>
+          <div class="logo-sub">Workflow Automation</div>
+        </div>
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Menu chính</div>
+      <div class="nav-item active" data-view="dashboard">
+        <span class="nav-icon">📊</span> Dashboard
+      </div>
+      <div class="nav-item" data-view="chat">
+        <span class="nav-icon">💬</span> Chat Demo
+        <span class="nav-badge">AI</span>
+      </div>
+      <div class="nav-item" data-view="rooms">
+        <span class="nav-icon">🏠</span> Quản lý Phòng
+      </div>
+      <div class="nav-item" data-view="bookings">
+        <span class="nav-icon">📅</span> Đặt Phòng
+      </div>
+      <div class="nav-item" data-view="automation">
+        <span class="nav-icon">⚡</span> Automation Hub
+        <span class="nav-badge">6</span>
+      </div>
+
+      <div class="nav-label" style="margin-top:1rem">Hệ thống</div>
+      <div class="nav-item" data-view="settings">
+        <span class="nav-icon">⚙️</span> Cài Đặt
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="version">v1.0.0 — Demo Build</div>
+      <div>Chi phí: <strong style="color:var(--success)">$0/tháng</strong> ✨</div>
+    </div>
+  </nav>
+
+  <!-- ═══════════════ MAIN CONTENT ═══════════════ -->
+  <main id="main-content">
+
+    <!-- Mobile header -->
+    <div id="mobile-header">
+      <button id="menu-toggle">☰</button>
+      <span style="font-weight:800;font-size:1rem">🏡 Bliss AI Hub</span>
+    </div>
+
+    <!-- ─── VIEW: DASHBOARD ─── -->
+    <div id="view-dashboard" class="view active">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Dashboard <span>Tổng quan</span></h1>
+          <p class="page-subtitle">Hệ thống đang hoạt động ổn định • Cập nhật real-time</p>
+        </div>
+        <div style="display:flex;gap:0.5rem;align-items:center">
+          <span style="font-size:0.78rem;color:var(--text-muted)">📅 <span id="today-date"></span></span>
+        </div>
+      </div>
+
+      <!-- KPI Cards -->
+      <div class="kpi-grid">
+        <div class="kpi-card kpi-purple">
+          <div class="kpi-header">
+            <span class="kpi-label">Booking Active</span>
+            <span class="kpi-icon">📋</span>
+          </div>
+          <div class="kpi-value" id="stat-bookings">—</div>
+          <div class="kpi-sub">Tổng đặt phòng đang hiệu lực</div>
+        </div>
+        <div class="kpi-card kpi-green">
+          <div class="kpi-header">
+            <span class="kpi-label">Doanh thu</span>
+            <span class="kpi-icon">💰</span>
+          </div>
+          <div class="kpi-value" id="stat-revenue" style="font-size:1.3rem">—</div>
+          <div class="kpi-sub">Tổng từ booking confirmed</div>
+        </div>
+        <div class="kpi-card kpi-cyan">
+          <div class="kpi-header">
+            <span class="kpi-label">Công suất phòng</span>
+            <span class="kpi-icon">🏠</span>
+          </div>
+          <div class="kpi-value" id="stat-occupancy">—</div>
+          <div class="kpi-sub">
+            <div class="occupancy-wrap">
+              <div class="occupancy-bar-bg"><div id="occupancy-bar"></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="kpi-card kpi-orange">
+          <div class="kpi-header">
+            <span class="kpi-label">Check-in ngày mai</span>
+            <span class="kpi-icon">🔑</span>
+          </div>
+          <div class="kpi-value" id="stat-checkin">—</div>
+          <div class="kpi-sub">Auto reminder sẽ gửi lúc 9:00 SA</div>
+        </div>
+      </div>
+
+      <!-- Main grid -->
+      <div class="dashboard-grid">
+        <div class="dashboard-left">
+          <!-- Branch breakdown -->
+          <div class="card">
+            <div class="card-title">📍 Công suất theo chi nhánh</div>
+            <div id="branch-stats"></div>
+          </div>
+
+          <!-- Recent bookings -->
+          <div class="card">
+            <div class="card-title" style="margin-bottom:0.75rem">📋 Đặt phòng gần đây</div>
+            <div id="recent-bookings"></div>
+            <div style="margin-top:0.75rem;text-align:center">
+              <button class="btn btn-ghost text-sm" onclick="navigateTo('bookings')">Xem tất cả →</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="dashboard-right">
+          <!-- Slack/Telegram notifications simulation -->
+          <div class="card">
+            <div class="card-title">🔔 Alerts nội bộ (Slack sim)</div>
+            <div id="notification-panel">
+              <div style="color:var(--text-muted);font-size:0.8rem;text-align:center;padding:1rem">Chưa có alert. Thử demo chat để tạo!</div>
+            </div>
+          </div>
+
+          <!-- Activity feed -->
+          <div class="card" style="flex:1">
+            <div class="card-title">⚡ Hoạt động gần đây</div>
+            <div id="activity-feed"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── VIEW: CHAT DEMO ─── -->
+    <div id="view-chat" class="view">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">💬 Chat <span>Demo AI</span></h1>
+          <p class="page-subtitle">Demo FR01–FR04 · AI chạy offline, không cần API key · Nhập key Gemini để nâng cấp</p>
+        </div>
+      </div>
+
+      <div class="chat-layout">
+        <!-- Chat window -->
+        <div class="chat-main">
+          <div class="chat-header">
+            <div class="chat-avatar">🤖</div>
+            <div>
+              <div class="chat-name">Bliss AI Assistant</div>
+              <div class="chat-status">Online — Phản hồi tức thì</div>
+            </div>
+            <span class="chat-mode">⚡ Rule-based NLP</span>
+          </div>
+
+          <!-- Quick chips -->
+          <div class="quick-chips">
+            <button class="quick-chip">Còn phòng Đà Lạt cuối tuần?</button>
+            <button class="quick-chip">Giá phòng 2 người Hội An 28/6</button>
+            <button class="quick-chip">Mã cửa check-in</button>
+            <button class="quick-chip">WiFi homestay</button>
+            <button class="quick-chip">Máy lạnh không hoạt động</button>
+            <button class="quick-chip">Đón sân bay</button>
+          </div>
+
+          <!-- Messages -->
+          <div id="chat-messages"></div>
+
+          <!-- Input -->
+          <div class="chat-input-wrap">
+            <textarea id="chat-input" rows="1" placeholder="Nhắn tin với AI... (Enter để gửi)"></textarea>
+            <button id="chat-send">➤</button>
+          </div>
+        </div>
+
+        <!-- Chat sidebar: NLP debug + info -->
+        <div class="chat-sidebar">
+          <div class="card">
+            <div class="card-title">🧠 NLP Debug Panel</div>
+            <p style="font-size:0.75rem;color:var(--text-muted);margin-bottom:0.5rem">Kết quả phân tích từ tin nhắn cuối:</p>
+            <div id="nlp-debug" class="hidden">
+              <pre id="nlp-debug-content"></pre>
+            </div>
+            <div id="nlp-debug-placeholder" style="font-size:0.75rem;color:var(--text-muted)">Gửi tin nhắn để xem kết quả NLP...</div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">📊 FR Flow đang demo</div>
+            <div style="display:flex;flex-direction:column;gap:0.5rem;font-size:0.78rem">
+              <div style="display:flex;align-items:center;gap:0.5rem">
+                <span style="background:rgba(99,102,241,0.2);padding:2px 8px;border-radius:4px;color:var(--primary-light);font-weight:700">FR01</span>
+                <span>NLP Entity Extraction</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:0.5rem">
+                <span style="background:rgba(16,185,129,0.2);padding:2px 8px;border-radius:4px;color:#34d399;font-weight:700">FR02</span>
+                <span>Quoting + Availability</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:0.5rem">
+                <span style="background:rgba(245,158,11,0.2);padding:2px 8px;border-radius:4px;color:#fbbf24;font-weight:700">FR03</span>
+                <span>Intent Routing + Handoff</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:0.5rem">
+                <span style="background:rgba(139,92,246,0.2);padding:2px 8px;border-radius:4px;color:#c4b5fd;font-weight:700">FR04</span>
+                <span>CRM Booking Creation</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">🤖 Bot state</div>
+            <div style="font-size:0.78rem;color:var(--text-secondary)">
+              State: <strong id="bot-state-display" style="color:var(--primary-light)">IDLE</strong>
+            </div>
+            <div style="font-size:0.72rem;color:var(--text-muted);margin-top:0.5rem">
+              Thử đặt phòng đầy đủ:<br>
+              1. Hỏi phòng Đà Lạt<br>
+              2. Nhập ngày + số người<br>
+              3. Chọn phòng (gõ "1")<br>
+              4. Xác nhận (gõ "OK")<br>
+              → Booking tự động tạo! 🎉
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">⚙️ Nâng cấp AI</div>
+            <div style="font-size:0.75rem;color:var(--text-secondary);margin-bottom:0.5rem">
+              Thêm Gemini API key (miễn phí) để AI hiểu tiếng Việt tự nhiên hơn:
+            </div>
+            <a href="https://aistudio.google.com/apikey" target="_blank" style="display:block;text-align:center;padding:0.45rem;background:rgba(99,102,241,0.15);border:1px solid rgba(99,102,241,0.3);border-radius:var(--radius-sm);color:var(--primary-light);font-size:0.78rem;font-weight:600;text-decoration:none;transition:all 0.2s">
+              🔑 Lấy API Key miễn phí →
+            </a>
+            <div style="font-size:0.7rem;color:var(--text-muted);margin-top:0.4rem;text-align:center">Vào Cài đặt → dán API key vào</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── VIEW: ROOMS ─── -->
+    <div id="view-rooms" class="view">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">🏠 Quản lý <span>Phòng</span></h1>
+          <p class="page-subtitle">6 phòng tại 3 chi nhánh · Trạng thái real-time từ booking</p>
+        </div>
+      </div>
+
+      <div class="filter-bar">
+        <span style="font-size:0.82rem;color:var(--text-muted)">Lọc chi nhánh:</span>
+        <select class="filter-select" id="room-branch-filter">
+          <option value="all">Tất cả chi nhánh</option>
+          <option value="da_lat">🏔️ Đà Lạt</option>
+          <option value="hoi_an">🏮 Hội An</option>
+          <option value="nha_trang">🌊 Nha Trang</option>
+        </select>
+        <button class="btn btn-primary" style="margin-left:auto; font-size:0.8rem; padding:0.5rem 1rem;" onclick="openAddRoomModal()">
+          ➕ Thêm phòng mới
+        </button>
+      </div>
+
+      <div class="rooms-grid" id="rooms-grid"></div>
+    </div>
+
+    <!-- ─── VIEW: BOOKINGS ─── -->
+    <div id="view-bookings" class="view">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">📅 Quản lý <span>Đặt phòng</span></h1>
+          <p class="page-subtitle">CRM tích hợp · Cập nhật trạng thái trực tiếp · Anti-overbooking</p>
+        </div>
+      </div>
+
+      <div class="filter-bar">
+        <span style="font-size:0.82rem;color:var(--text-muted)">Trạng thái:</span>
+        <select class="filter-select" id="booking-status-filter">
+          <option value="all">Tất cả</option>
+          <option value="confirmed">✅ Xác nhận</option>
+          <option value="checked_in">🏠 Đang ở</option>
+          <option value="checked_out">👋 Đã trả</option>
+          <option value="cancelled">❌ Đã huỷ</option>
+        </select>
+      </div>
+
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Mã</th>
+                <th>Khách hàng</th>
+                <th>Phòng / Chi nhánh</th>
+                <th>Ngày</th>
+                <th>Khách</th>
+                <th>Tổng tiền</th>
+                <th>Nguồn</th>
+                <th>Trạng thái</th>
+                <th>Thao tác</th>
+              </tr>
+            </thead>
+            <tbody id="bookings-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── VIEW: AUTOMATION ─── -->
+    <div id="view-automation" class="view">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">⚡ Automation <span>Hub</span></h1>
+          <p class="page-subtitle">Mô phỏng 6 Make.com Scenarios · Bấm "Chạy ngay" để test</p>
+        </div>
+      </div>
+
+      <!-- Scenarios -->
+      <div style="margin-bottom:1.5rem">
+        <div class="card-title" style="margin-bottom:1rem;font-size:0.85rem;color:var(--text-secondary)">
+          📡 SCENARIOS ĐANG HOẠT ĐỘNG (demo Make.com workflows)
+        </div>
+        <div id="scenarios-grid"></div>
+      </div>
+
+      <!-- Logs -->
+      <div class="card">
+        <div class="card-title" style="margin-bottom:0.75rem">📋 Execution Logs</div>
+        <div id="automation-logs"></div>
+      </div>
+
+      <!-- Stats -->
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-top:1.25rem">
+        <div class="card" style="text-align:center">
+          <div style="font-size:2rem;font-weight:800;color:var(--primary-light)">~7,300</div>
+          <div style="font-size:0.75rem;color:var(--text-muted);margin-top:0.25rem">Operations/tháng ước tính</div>
+        </div>
+        <div class="card" style="text-align:center">
+          <div style="font-size:2rem;font-weight:800;color:var(--success)">$0</div>
+          <div style="font-size:0.75rem;color:var(--text-muted);margin-top:0.25rem">Chi phí demo này</div>
+        </div>
+        <div class="card" style="text-align:center">
+          <div style="font-size:2rem;font-weight:800;color:var(--warning)">$16</div>
+          <div style="font-size:0.75rem;color:var(--text-muted);margin-top:0.25rem">Make.com thật/tháng</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── VIEW: SETTINGS ─── -->
+    <div id="view-settings" class="view">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">⚙️ <span>Cài đặt</span></h1>
+          <p class="page-subtitle">Cấu hình API, chi nhánh và tuỳ chỉnh hệ thống</p>
+        </div>
+      </div>
+
+      <div class="settings-grid">
+        <div>
+          <div class="card">
+            <div class="settings-title">🤖 Tích hợp AI & Fanpage</div>
+            <div class="form-group">
+              <label class="form-label">Google Gemini API Key (tuỳ chọn)</label>
+              <input type="password" id="settings-gemini-key" class="form-input" placeholder="AIzaSy..." />
+              <div class="form-hint">
+                Không bắt buộc — bot hoạt động offline không cần key.<br>
+                Có key → AI hiểu tiếng Việt tự nhiên hơn.<br>
+                <a href="https://aistudio.google.com/apikey" target="_blank">Lấy key miễn phí tại Google AI Studio →</a>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Mã PIN cửa check-in</label>
+              <input type="text" id="settings-pin" class="form-input" placeholder="6789" />
+              <div class="form-hint">Bot sẽ gửi mã này khi khách hỏi check-in</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Facebook Page ID</label>
+              <input type="text" id="settings-fb-pageid" class="form-input" placeholder="Ví dụ: 1160190843838271" />
+              <div class="form-hint">ID Fanpage Facebook đã kết nối</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Facebook Page Access Token</label>
+              <input type="password" id="settings-fb-token" class="form-input" placeholder="EAASt37igz3cBRo..." />
+              <div class="form-hint">Mã truy cập trang để kết nối Live Chatbot</div>
+            </div>
+            <button class="btn btn-primary" id="btn-save-settings">💾 Lưu cài đặt</button>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:1rem">
+          <div class="card">
+            <div class="settings-title">📊 Thông tin hệ thống</div>
+            <div style="display:flex;flex-direction:column;gap:0.6rem;font-size:0.82rem">
+              <div class="flex justify-between"><span class="text-muted">Platform</span> <strong>Browser + localStorage</strong></div>
+              <div class="flex justify-between"><span class="text-muted">AI Engine</span> <strong>Rule-based NLP + Gemini</strong></div>
+              <div class="flex justify-between"><span class="text-muted">Database</span> <strong>localStorage (demo)</strong></div>
+              <div class="flex justify-between"><span class="text-muted">Chi nhánh</span> <strong>3 (Đà Lạt, Hội An, Nha Trang)</strong></div>
+              <div class="flex justify-between"><span class="text-muted">Số phòng</span> <strong>6 phòng</strong></div>
+              <div class="flex justify-between"><span class="text-muted">Chi phí tháng này</span> <strong style="color:var(--success)">$0</strong></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="settings-title">🗑️ Reset Demo</div>
+            <p style="font-size:0.78rem;color:var(--text-muted);margin-bottom:1rem">Reset toàn bộ dữ liệu về trạng thái ban đầu (rooms, bookings, chat history).</p>
+            <button class="btn btn-danger" id="btn-reset-data">🔄 Reset dữ liệu demo</button>
+          </div>
+
+          <div class="card">
+            <div class="settings-title">🗺️ Roadmap Make.com thực tế</div>
+            <div style="font-size:0.78rem;color:var(--text-secondary);line-height:1.6">
+              Khi deploy thực tế:<br>
+              1. 📘 Facebook/Zalo Webhook → Make.com<br>
+              2. 🧠 Make.com gọi OpenAI/Gemini API<br>
+              3. 📊 Sync với Airtable (thay localStorage)<br>
+              4. 📅 Google Calendar sync (iCal)<br>
+              5. 💬 Slack alerts cho nhân viên<br>
+              <strong style="color:var(--primary-light)">Chi phí: ~$52/tháng</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Scripts -->
+<script src="js/data.js"></script>
+<script src="js/nlp.js"></script>
+<script src="js/chatbot.js"></script>
+<script src="js/automation.js"></script>
+<script src="js/app.js"></script>
+
+<script>
+  // Set today's date
+  document.getElementById('today-date').textContent = new Date().toLocaleDateString('vi-VN', { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' });
+
+  // Update bot state display
+  setInterval(() => {
+    const el = document.getElementById('bot-state-display');
+    if (el) el.textContent = CHATBOT.state;
+
+    const dbgPlaceholder = document.getElementById('nlp-debug-placeholder');
+    const dbgPanel = document.getElementById('nlp-debug');
+    if (window.lastEntities) {
+      dbgPlaceholder?.classList.add('hidden');
+      dbgPanel?.classList.remove('hidden');
+    }
+  }, 500);
+</script>
+<!-- ═══════════════ ROOM MODAL (ADD / EDIT) ═══════════════ -->
+<div id="room-modal" class="modal hidden">
+  <div class="modal-backdrop" onclick="closeRoomModal()"></div>
+  <div class="modal-content card">
+    <div class="modal-header">
+      <h2 id="room-modal-title" class="page-title">🏠 Thêm <span>Phòng Mới</span></h2>
+      <button class="modal-close" onclick="closeRoomModal()">×</button>
+    </div>
+    <form id="room-form" onsubmit="saveRoom(event)">
+      <input type="hidden" id="room-id-input" />
+      
+      <div class="form-row">
+        <div class="form-group flex-1">
+          <label class="form-label" for="room-name-input">Tên phòng *</label>
+          <input type="text" id="room-name-input" class="form-input" required placeholder="Ví dụ: Deluxe River View" />
+        </div>
+        <div class="form-group" style="width: 100px;">
+          <label class="form-label" for="room-emoji-input">Emoji *</label>
+          <input type="text" id="room-emoji-input" class="form-input text-center" required value="🏠" />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group flex-1">
+          <label class="form-label" for="room-branch-input">Chi nhánh *</label>
+          <select id="room-branch-input" class="form-input">
+            <option value="da_lat">🏔️ Đà Lạt</option>
+            <option value="hoi_an">🏮 Hội An</option>
+            <option value="nha_trang">🌊 Nha Trang</option>
+          </select>
+        </div>
+        <div class="form-group flex-1">
+          <label class="form-label" for="room-capacity-input">Sức chứa (khách) *</label>
+          <input type="number" id="room-capacity-input" class="form-input" min="1" max="20" required value="2" />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group flex-1">
+          <label class="form-label" for="room-price-weekday">Giá ngày thường (VND) *</label>
+          <input type="number" id="room-price-weekday" class="form-input" min="0" required placeholder="800000" />
+        </div>
+        <div class="form-group flex-1">
+          <label class="form-label" for="room-price-weekend">Giá cuối tuần (VND) *</label>
+          <input type="number" id="room-price-weekend" class="form-input" min="0" required placeholder="1200000" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="room-amenities-input">Tiện nghi (phân cách bằng dấu phẩy)</label>
+        <input type="text" id="room-amenities-input" class="form-input" placeholder="WiFi, TV, Điều hoà, Bồn tắm, Ban công" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="room-desc-input">Mô tả ngắn</label>
+        <textarea id="room-desc-input" class="form-input" rows="3" placeholder="Mô tả phong cách phòng, tầm nhìn..."></textarea>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group flex-1">
+          <label class="form-label" for="room-status-input">Trạng thái hoạt động</label>
+          <select id="room-status-input" class="form-input">
+            <option value="active">🟢 Đang hoạt động (Active)</option>
+            <option value="inactive">🔴 Ngừng hoạt động (Inactive)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-ghost" onclick="closeRoomModal()">Huỷ</button>
+        <button type="submit" class="btn btn-primary" id="btn-room-save-submit">💾 Lưu lại</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+</body>
+</html>

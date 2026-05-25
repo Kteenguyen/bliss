@@ -23,12 +23,12 @@ const BRANCH_META = {
 };
 
 const SEED_ROOMS = [
-  { room_id:'R001', room_name:'Phòng Sương Mù',    branch:'da_lat',    branch_name:'Đà Lạt',    capacity:2, base_price_weekday:800000,  base_price_weekend:1200000, amenities:['WiFi','TV','Điều hoà','Bồn tắm','Ban công view núi'], emoji:'🏔️', description:'Phòng lãng mạn với view núi sương mù buổi sáng, bồn tắm đá và ban công riêng.', status:'active' },
-  { room_id:'R002', room_name:'Suite Hoa Anh Đào', branch:'da_lat',    branch_name:'Đà Lạt',    capacity:4, base_price_weekday:1500000, base_price_weekend:2200000, amenities:['WiFi','TV','Điều hoà','Bếp mini','Phòng khách','Lò sưởi'], emoji:'🌸', description:'Suite gia đình rộng rãi, phòng khách riêng, lò sưởi ấm cúng mùa đông.', status:'active' },
-  { room_id:'R003', room_name:'Phòng Hội An Cổ',  branch:'hoi_an',    branch_name:'Hội An',    capacity:2, base_price_weekday:900000,  base_price_weekend:1400000, amenities:['WiFi','TV','Điều hoà','Hồ bơi chung','Xe đạp miễn phí'], emoji:'🏮', description:'Phong cách cổ trấn Hội An, hồ bơi và xe đạp để khám phá phố cổ.', status:'active' },
-  { room_id:'R004', room_name:'Lantern Loft',      branch:'hoi_an',    branch_name:'Hội An',    capacity:3, base_price_weekday:1200000, base_price_weekend:1800000, amenities:['WiFi','TV','Điều hoà','Hồ bơi','Bữa sáng included'], emoji:'🪔', description:'Phòng Loft 2 tầng độc đáo, view kênh nước Hội An, bao gồm bữa sáng.', status:'active' },
-  { room_id:'R005', room_name:'Phòng Biển Xanh',  branch:'nha_trang', branch_name:'Nha Trang', capacity:2, base_price_weekday:700000,  base_price_weekend:1100000, amenities:['WiFi','TV','Điều hoà','View biển trực tiếp','Bãi tắm riêng'], emoji:'🌊', description:'View biển trực tiếp từ giường ngủ, 50m đến bãi tắm riêng.', status:'active' },
-  { room_id:'R006', room_name:'Sunset Villa',      branch:'nha_trang', branch_name:'Nha Trang', capacity:6, base_price_weekday:3500000, base_price_weekend:5000000, amenities:['WiFi','3 phòng ngủ','Hồ bơi riêng','Bếp đầy đủ','BBQ','View hoàng hôn'], emoji:'🌅', description:'Villa hạng sang 3 phòng ngủ, hồ bơi riêng, lý tưởng cho nhóm và gia đình.', status:'active' },
+  { room_id:'R001', room_name:'Phòng Sương Mù',    branch:'da_lat',    branch_name:'Đà Lạt',    capacity:2, base_price_weekday:800000,  base_price_weekend:1200000, hourly_price_day:239000, hourly_price_night:359000, images:['images/room_1_main.png','images/room_1_bath.png','images/room_1_main.png'], amenities:['Bếp tự nấu','Máy chiếu','Bồn tắm','Board game','Tủ lạnh','NVS riêng','Gương lớn'], emoji:'🏔️', description:'Phòng lãng mạn với view núi sương mù buổi sáng, bồn tắm đá và ban công riêng.', status:'active' },
+  { room_id:'R002', room_name:'Suite Hoa Anh Đào', branch:'da_lat',    branch_name:'Đà Lạt',    capacity:4, base_price_weekday:1500000, base_price_weekend:2200000, hourly_price_day:249000, hourly_price_night:379000, images:['images/room_2_main.png','images/room_2_bath.png','images/room_2_main.png'], amenities:['Bếp tự nấu','Máy chiếu','Sofa bàn trà','Bồn tắm','Board game','Tủ lạnh','NVS riêng','Gương lớn'], emoji:'🌸', description:'Suite gia đình rộng rãi, phòng khách riêng, lò sưởi ấm cúng mùa đông.', status:'active' },
+  { room_id:'R003', room_name:'Phòng Hội An Cổ',  branch:'hoi_an',    branch_name:'Hội An',    capacity:2, base_price_weekday:900000,  base_price_weekend:1400000, hourly_price_day:239000, hourly_price_night:359000, images:['images/room_1_main.png','images/room_1_bath.png','images/room_1_main.png'], amenities:['Bếp tự nấu','Bồn tắm','Board game','Tủ lạnh','NVS riêng','Gương lớn'], emoji:'🏮', description:'Phong cách cổ trấn Hội An, hồ bơi và xe đạp để khám phá phố cổ.', status:'active' },
+  { room_id:'R004', room_name:'Lantern Loft',      branch:'hoi_an',    branch_name:'Hội An',    capacity:3, base_price_weekday:1200000, base_price_weekend:1800000, hourly_price_day:249000, hourly_price_night:379000, images:['images/room_2_main.png','images/room_2_bath.png','images/room_2_main.png'], amenities:['Bếp tự nấu','Máy chiếu','Sofa bàn trà','Bồn tắm','Tủ lạnh','NVS riêng','Gương lớn'], emoji:'🪔', description:'Phòng Loft 2 tầng độc đáo, view kênh nước Hội An, bao gồm bữa sáng.', status:'active' },
+  { room_id:'R005', room_name:'Phòng Biển Xanh',  branch:'nha_trang', branch_name:'Nha Trang', capacity:2, base_price_weekday:700000,  base_price_weekend:1100000, hourly_price_day:239000, hourly_price_night:359000, images:['images/room_1_main.png','images/room_1_bath.png','images/room_1_main.png'], amenities:['Máy chiếu','Bồn tắm','Board game','Tủ lạnh','NVS riêng','Gương lớn'], emoji:'🌊', description:'View biển trực tiếp từ giường ngủ, 50m đến bãi tắm riêng.', status:'active' },
+  { room_id:'R006', room_name:'Sunset Villa',      branch:'nha_trang', branch_name:'Nha Trang', capacity:6, base_price_weekday:3500000, base_price_weekend:5000000, hourly_price_day:499000, hourly_price_night:699000, images:['images/room_2_main.png','images/room_2_bath.png','images/room_2_main.png'], amenities:['Bếp tự nấu','Máy chiếu','Sofa bàn trà','Bồn tắm','Board game','Tủ lạnh','NVS riêng','Gương lớn'], emoji:'🌅', description:'Villa hạng sang 3 phòng ngủ, hồ bơi riêng, lý tưởng cho nhóm và gia đình.', status:'active' },
 ];
 
 const SEED_BOOKINGS = [
@@ -91,12 +91,18 @@ const DB = {
       capacity:            Number(data.capacity) || 2,
       base_price_weekday:  Number(data.base_price_weekday) || 0,
       base_price_weekend:  Number(data.base_price_weekend) || 0,
+      hourly_price_day:    Number(data.hourly_price_day) || 239000,
+      hourly_price_night:  Number(data.hourly_price_night) || 359000,
+      images:              Array.isArray(data.images) ? data.images : (data.images || '').split(',').map(s=>s.trim()).filter(Boolean),
       amenities:           Array.isArray(data.amenities) ? data.amenities : (data.amenities||'').split(',').map(s=>s.trim()).filter(Boolean),
       emoji:               data.emoji || '🏠',
       description:         data.description || '',
       status:              data.status || 'active',
       created_at:          new Date().toISOString(),
     };
+    if (room.images.length === 0) {
+      room.images = ['images/room_1_main.png', 'images/room_1_bath.png', 'images/room_1_main.png'];
+    }
     rooms.push(room);
     localStorage.setItem(STORAGE.ROOMS, JSON.stringify(rooms));
     this.addActivity({ type:'room', msg:`🏠 Thêm phòng mới: ${room.room_name} (${room.branch_name})`, color:'green' });
@@ -112,9 +118,13 @@ const DB = {
       updates.branch_name = BRANCH_META[updates.branch]?.name || updates.branch;
     if (updates.amenities && !Array.isArray(updates.amenities))
       updates.amenities = updates.amenities.split(',').map(s=>s.trim()).filter(Boolean);
+    if (updates.images && !Array.isArray(updates.images))
+      updates.images = updates.images.split(',').map(s=>s.trim()).filter(Boolean);
     if (updates.capacity)          updates.capacity          = Number(updates.capacity);
     if (updates.base_price_weekday) updates.base_price_weekday = Number(updates.base_price_weekday);
     if (updates.base_price_weekend) updates.base_price_weekend = Number(updates.base_price_weekend);
+    if (updates.hourly_price_day)   updates.hourly_price_day   = Number(updates.hourly_price_day);
+    if (updates.hourly_price_night) updates.hourly_price_night = Number(updates.hourly_price_night);
     rooms[idx] = { ...rooms[idx], ...updates, updated_at: new Date().toISOString() };
     localStorage.setItem(STORAGE.ROOMS, JSON.stringify(rooms));
     this.addActivity({ type:'room', msg:`✏️ Cập nhật phòng: ${rooms[idx].room_name}`, color:'blue' });

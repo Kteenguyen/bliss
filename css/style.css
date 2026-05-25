@@ -662,3 +662,250 @@ option { background: #1a1a2e; }
   .chat-layout { height: 80vh; }
   .chat-main { height: 80vh; }
 }
+
+/* ============================================================
+   Dozy Home Customer Portal & Booking Styles
+   ============================================================ */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.cust-room-card {
+  display: flex;
+  background: #1c1917; /* Dark stone theme */
+  border: 1px solid rgba(249, 115, 22, 0.15);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-bottom: 1.5rem;
+}
+.cust-room-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(249, 115, 22, 0.4);
+  box-shadow: 0 15px 35px rgba(249, 115, 22, 0.15);
+}
+.cust-collage-container {
+  display: flex;
+  width: 45%;
+  flex-shrink: 0;
+  border-right: 1px solid rgba(249, 115, 22, 0.15);
+}
+.cust-collage-main {
+  width: 60%;
+  position: relative;
+  overflow: hidden;
+}
+.cust-collage-main img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.5s ease;
+}
+.cust-room-card:hover .cust-collage-main img {
+  transform: scale(1.03);
+}
+.cust-collage-subs {
+  width: 40%;
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid rgba(249, 115, 22, 0.15);
+}
+.cust-collage-sub {
+  height: 50%;
+  overflow: hidden;
+  position: relative;
+}
+.cust-collage-sub img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.5s ease;
+}
+.cust-room-card:hover .cust-collage-sub img {
+  transform: scale(1.03);
+}
+.cust-collage-sub:first-child {
+  border-bottom: 1px solid rgba(249, 115, 22, 0.15);
+}
+.cust-room-details {
+  flex: 1;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.cust-room-title {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #fed7aa;
+  margin: 0 0 0.4rem 0;
+}
+.cust-room-price {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #f97316;
+  margin-bottom: 1rem;
+}
+.cust-room-amenities {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.6rem;
+  margin-bottom: 1.25rem;
+}
+.cust-amenity-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  color: #fed7aa;
+}
+.cust-amenity-icon {
+  font-size: 1rem;
+  color: #f97316;
+  width: 20px;
+  text-align: center;
+}
+.cust-book-now-btn {
+  background: linear-gradient(135deg, #d97706, #92400e);
+  color: white;
+  border: none;
+  padding: 0.65rem 1.25rem;
+  border-radius: var(--radius-sm);
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(217, 119, 6, 0.3);
+}
+.cust-book-now-btn:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.1);
+  box-shadow: 0 6px 16px rgba(217, 119, 6, 0.5);
+}
+
+.cust-date-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 72px;
+  height: 72px;
+  background: #292524;
+  border: 1px solid rgba(249, 115, 22, 0.2);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+  flex-shrink: 0;
+}
+.cust-date-btn:hover {
+  background: #44403c;
+  border-color: rgba(249, 115, 22, 0.5);
+}
+.cust-date-btn.active {
+  background: #78350f;
+  border-color: #f97316;
+  box-shadow: 0 0 10px rgba(249, 115, 22, 0.3);
+}
+.cust-date-header {
+  font-size: 0.62rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+.cust-date-btn.active .cust-date-header {
+  color: #fed7aa;
+}
+.cust-date-body {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #fed7aa;
+}
+.cust-date-btn.active .cust-date-body {
+  color: #fff;
+}
+
+.cust-slot-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0.65rem 0.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+  font-family: inherit;
+}
+.cust-slot-btn.available {
+  background: #fef3c7; /* Cream */
+  color: #78350f;
+  border-color: #fde68a;
+}
+.cust-slot-btn.available:hover {
+  background: #fde68a;
+}
+.cust-slot-btn.selected {
+  background: #d97706; /* Orange */
+  color: #fff;
+  border-color: #f59e0b;
+  font-weight: bold;
+  box-shadow: 0 0 10px rgba(217, 119, 6, 0.4);
+}
+.cust-slot-btn.booked {
+  background: #44403c; /* Grey */
+  color: #8c857b;
+  border-color: #292524;
+  cursor: not-allowed;
+  opacity: 0.75;
+}
+.cust-slot-time {
+  font-size: 0.78rem;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+.cust-slot-price {
+  font-size: 0.68rem;
+}
+
+.cust-dot {
+  width: 8px;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.cust-dot.active {
+  background: #f97316;
+  width: 16px;
+  border-radius: 4px;
+}
+
+@media (max-width: 768px) {
+  .cust-room-card {
+    flex-direction: column;
+  }
+  .cust-collage-container {
+    width: 100%;
+    height: 200px;
+    border-right: none;
+    border-bottom: 1px solid rgba(249, 115, 22, 0.15);
+  }
+  .cust-room-details {
+    padding: 1.25rem;
+  }
+  .cust-room-amenities {
+    grid-template-columns: 1fr;
+  }
+}
+

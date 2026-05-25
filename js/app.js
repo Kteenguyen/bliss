@@ -146,6 +146,7 @@ function navigateTo(view) {
     case 'dashboard': renderDashboard(); break;
     case 'rooms': renderRooms(); break;
     case 'bookings': renderBookings(); break;
+    case 'customer': renderCustomerPortal(); break;
     case 'automation': AUTOMATION.init(); break;
     case 'settings': renderSettings(); break;
   }
@@ -285,9 +286,16 @@ function openAddRoomModal() {
   document.getElementById('room-capacity-input').value = '2';
   document.getElementById('room-price-weekday').value = '';
   document.getElementById('room-price-weekend').value = '';
-  document.getElementById('room-amenities-input').value = '';
+  document.getElementById('room-hourly-day').value = '239000';
+  document.getElementById('room-hourly-night').value = '359000';
+  document.getElementById('room-images-input').value = '';
   document.getElementById('room-desc-input').value = '';
   document.getElementById('room-status-input').value = 'active';
+
+  // Uncheck all checkboxes in checklist
+  document.querySelectorAll('#room-amenities-checklist input[type="checkbox"]').forEach(cb => {
+    cb.checked = false;
+  });
 
   modal.classList.remove('hidden');
 }
@@ -306,9 +314,17 @@ function openEditRoomModal(id) {
   document.getElementById('room-capacity-input').value = r.capacity;
   document.getElementById('room-price-weekday').value = r.base_price_weekday;
   document.getElementById('room-price-weekend').value = r.base_price_weekend;
-  document.getElementById('room-amenities-input').value = (r.amenities || []).join(', ');
+  document.getElementById('room-hourly-day').value = r.hourly_price_day || 239000;
+  document.getElementById('room-hourly-night').value = r.hourly_price_night || 359000;
+  document.getElementById('room-images-input').value = (r.images || []).join(', ');
   document.getElementById('room-desc-input').value = r.description || '';
   document.getElementById('room-status-input').value = r.status || 'active';
+
+  // Check matching checkboxes in checklist
+  const amenitiesSet = new Set(r.amenities || []);
+  document.querySelectorAll('#room-amenities-checklist input[type="checkbox"]').forEach(cb => {
+    cb.checked = amenitiesSet.has(cb.value);
+  });
 
   modal.classList.remove('hidden');
 }
@@ -325,9 +341,11 @@ function saveRoom(event) {
   const emoji = document.getElementById('room-emoji-input').value.trim();
   const branch = document.getElementById('room-branch-input').value;
   const capacity = parseInt(document.getElementById('room-capacity-input').value);
-  const weekday = parseFloat(document.getElementById('room-price-weekday').value);
-  const weekend = parseFloat(document.getElementById('room-price-weekend').value);
-  const amenities = document.getElementById('room-amenities-input').value.trim();
+  const weekday = parseFloat(document.getElementById('room-price-weekday').value) || 0;
+  const weekend = parseFloat(document.getElementById('room-price-weekend').value) || 0;
+  const hourlyDay = parseFloat(document.getElementById('room-hourly-day').value) || 239000;
+  const hourlyNight = parseFloat(document.getElementById('room-hourly-night').value) || 359000;
+  const images = document.getElementById('room-images-input').value.trim();
   const desc = document.getElementById('room-desc-input').value.trim();
   const status = document.getElementById('room-status-input').value;
 
@@ -336,13 +354,20 @@ function saveRoom(event) {
     return;
   }
 
+  // Collect checked checkboxes for amenities
+  const checkedBoxes = document.querySelectorAll('#room-amenities-checklist input[type="checkbox"]:checked');
+  const amenities = Array.from(checkedBoxes).map(cb => cb.value);
+
   const roomData = {
     room_name: name,
     emoji: emoji || '🏠',
     branch: branch,
     capacity: capacity || 2,
-    base_price_weekday: weekday || 0,
-    base_price_weekend: weekend || 0,
+    base_price_weekday: weekday,
+    base_price_weekend: weekend,
+    hourly_price_day: hourlyDay,
+    hourly_price_night: hourlyNight,
+    images: images,
     amenities: amenities,
     description: desc,
     status: status,
@@ -359,6 +384,7 @@ function saveRoom(event) {
   closeRoomModal();
   renderRooms();
   renderDashboard();
+  if (typeof renderCustomerPortal === 'function') renderCustomerPortal();
   pushToServer();
 }
 
@@ -586,4 +612,386 @@ function showToast(msg, type = 'info') {
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('room-branch-filter')?.addEventListener('change', renderRooms);
   document.getElementById('booking-status-filter')?.addEventListener('change', renderBookings);
+  document.getElementById('cust-branch-filter')?.addEventListener('change', renderCustomerPortal);
 });
+
+// ============================================================
+// Dozy Home Customer Portal Controllers
+// ============================================================
+let activeCustRoom = null;
+let activeCustDate = '';
+let selectedCustSlots = [];
+let currentSlideIndex = 0;
+
+const DOZY_SLOTS = [
+  { id: '10:00 - 13:00', label: '10:00 - 13:00', type: 'day' },
+  { id: '13:30 - 16:30', label: '13:30 - 16:30', type: 'day' },
+  { id: '17:00 - 20:00', label: '17:00 - 20:00', type: 'day' },
+  { id: '20:30 - 09:30', label: '20:30 - 09:30', type: 'night' }
+];
+
+function renderCustomerPortal() {
+  const branch = document.getElementById('cust-branch-filter')?.value || 'da_lat';
+  const rooms = DB.getRoomsByBranch(branch).filter(r => r.status === 'active');
+  const container = document.getElementById('cust-rooms-list');
+  if (!container) return;
+
+  if (rooms.length === 0) {
+    container.innerHTML = `<div style="text-align:center; color:var(--text-muted); padding:3rem;">Chưa có phòng hoạt động tại chi nhánh này.</div>`;
+    return;
+  }
+
+  container.innerHTML = rooms.map(r => {
+    const mainImage = r.images[0] || 'images/room_1_main.png';
+    const subImage1 = r.images[1] || 'images/room_1_bath.png';
+    const subImage2 = r.images[2] || r.images[0] || 'images/room_1_main.png';
+
+    const priceK = Math.round(r.hourly_price_day / 1000) + 'k';
+
+    const amenityIcons = {
+      'Bếp tự nấu': '🍳',
+      'Máy chiếu': '📽️',
+      'Sofa bàn trà': '🛋️',
+      'Bồn tắm': '🛁',
+      'Board game': '🎲',
+      'Tủ lạnh': '🍦',
+      'NVS riêng': '🚽',
+      'Gương lớn': '🪞',
+      'WiFi': '📶',
+      'Wifi': '📶'
+    };
+
+    const amenitiesHtml = (r.amenities || []).map(a => `
+      <div class="cust-amenity-item">
+        <span class="cust-amenity-icon">${amenityIcons[a] || '✨'}</span>
+        <span>${a}</span>
+      </div>
+    `).join('');
+
+    return `
+      <div class="cust-room-card">
+        <!-- Collage Container (Left) -->
+        <div class="cust-collage-container">
+          <div class="cust-collage-main">
+            <img src="${mainImage}" alt="${r.room_name} main" />
+          </div>
+          <div class="cust-collage-subs">
+            <div class="cust-collage-sub">
+              <img src="${subImage1}" alt="${r.room_name} sub 1" />
+            </div>
+            <div class="cust-collage-sub">
+              <img src="${subImage2}" alt="${r.room_name} sub 2" />
+            </div>
+          </div>
+        </div>
+        
+        <!-- Room Details (Right) -->
+        <div class="cust-room-details">
+          <div>
+            <h2 class="cust-room-title">${r.emoji || '🏠'} ${r.room_name}</h2>
+            <div class="cust-room-price">Giá chỉ từ ${priceK}/3h</div>
+            <div class="cust-room-amenities">
+              ${amenitiesHtml}
+            </div>
+          </div>
+          <button class="cust-book-now-btn" onclick="openCustBookingModal('${r.room_id}')">ĐẶT NGAY ➔</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function openCustBookingModal(roomId) {
+  const r = DB.getRoom(roomId);
+  if (!r) return;
+
+  activeCustRoom = r;
+  selectedCustSlots = [];
+
+  // Update modal title
+  document.getElementById('cust-modal-room-name').textContent = r.room_name;
+
+  // Render carousel slide photos
+  const slidesContainer = document.getElementById('cust-modal-slides');
+  const dotsContainer = document.getElementById('cust-modal-dots');
+  if (slidesContainer && dotsContainer) {
+    const imgs = r.images && r.images.length > 0 ? r.images : ['images/room_1_main.png', 'images/room_1_bath.png', 'images/room_1_main.png'];
+    slidesContainer.innerHTML = imgs.map(img => `
+      <div class="cust-modal-slide" style="min-width:100%; height:100%; position:relative;">
+        <img src="${img}" style="width:100%; height:100%; object-fit:cover; display:block;" />
+      </div>
+    `).join('');
+
+    dotsContainer.innerHTML = imgs.map((_, idx) => `
+      <span class="cust-dot ${idx === 0 ? 'active' : ''}" onclick="goToSlide(${idx})"></span>
+    `).join('');
+  }
+
+  currentSlideIndex = 0;
+  updateCarouselUI();
+
+  // Price banner
+  const banner = document.getElementById('cust-modal-price-banner');
+  if (banner) {
+    banner.textContent = `GIÁ CHỈ TỪ ${UTIL.fmtPrice(r.hourly_price_day)}/3H`;
+  }
+
+  // Setup date picker carousel
+  const datesContainer = document.getElementById('cust-modal-dates-container');
+  if (datesContainer) {
+    const dates = generateCustDates();
+    activeCustDate = dates[0].dateStr; // default to today
+    datesContainer.innerHTML = dates.map((d, idx) => `
+      <button type="button" class="cust-date-btn ${idx === 0 ? 'active' : ''}" id="cust-date-btn-${d.dateStr}" onclick="selectCustDate('${d.dateStr}')">
+        <div class="cust-date-header">${d.headerText}</div>
+        <div class="cust-date-body">${d.bodyText}</div>
+      </button>
+    `).join('');
+  }
+
+  renderCustSlots();
+
+  // Reset fields & checklist
+  document.getElementById('cust-book-name').value = '';
+  document.getElementById('cust-book-phone').value = '';
+  updateCustSummary();
+
+  document.getElementById('cust-booking-modal').classList.remove('hidden');
+}
+
+function closeCustBookingModal() {
+  document.getElementById('cust-booking-modal').classList.add('hidden');
+}
+
+function selectCustDate(dateStr) {
+  activeCustDate = dateStr;
+
+  document.querySelectorAll('.cust-date-btn').forEach(btn => btn.classList.remove('active'));
+  document.getElementById(`cust-date-btn-${dateStr}`)?.classList.add('active');
+
+  selectedCustSlots = [];
+
+  renderCustSlots();
+  updateCustSummary();
+}
+
+function renderCustSlots() {
+  const grid = document.getElementById('cust-modal-slots-grid');
+  if (!grid || !activeCustRoom) return;
+
+  grid.innerHTML = DOZY_SLOTS.map(slot => {
+    const isBooked = isSlotBooked(activeCustRoom.room_id, activeCustDate, slot.id);
+    const isSelected = selectedCustSlots.includes(slot.id);
+    const price = slot.type === 'day' ? activeCustRoom.hourly_price_day : activeCustRoom.hourly_price_night;
+
+    let cls = 'available';
+    let disabledAttr = '';
+    if (isBooked) {
+      cls = 'booked';
+      disabledAttr = 'disabled';
+    } else if (isSelected) {
+      cls = 'selected';
+    }
+
+    return `
+      <button type="button" class="cust-slot-btn ${cls}" ${disabledAttr} onclick="toggleCustSlot('${slot.id}')">
+        <div class="cust-slot-time">${slot.label}</div>
+        <div class="cust-slot-price">${UTIL.fmtPrice(price)}</div>
+      </button>
+    `;
+  }).join('');
+}
+
+function isSlotBooked(roomId, dateStr, slotId) {
+  const bookings = DB.getBookings().filter(b => 
+    b.room_id === roomId && 
+    b.check_in_date === dateStr && 
+    !['cancelled', 'checked_out'].includes(b.status)
+  );
+  
+  return bookings.some(b => {
+    const reqs = b.special_requests || '';
+    return reqs.includes(slotId);
+  });
+}
+
+function toggleCustSlot(slotId) {
+  const idx = selectedCustSlots.indexOf(slotId);
+  if (idx >= 0) {
+    selectedCustSlots.splice(idx, 1);
+  } else {
+    selectedCustSlots.push(slotId);
+  }
+
+  renderCustSlots();
+  updateCustSummary();
+}
+
+function updateCustSummary() {
+  if (!activeCustRoom) return;
+
+  const count = selectedCustSlots.length;
+  let subtotal = 0;
+
+  selectedCustSlots.forEach(slotId => {
+    const slot = DOZY_SLOTS.find(s => s.id === slotId);
+    if (slot) {
+      subtotal += slot.type === 'day' ? activeCustRoom.hourly_price_day : activeCustRoom.hourly_price_night;
+    }
+  });
+
+  const discount = count >= 2 ? Math.round(subtotal * 0.1) : 0;
+  const total = subtotal - discount;
+
+  document.getElementById('cust-summary-slots-count').textContent = `${count} khung`;
+  document.getElementById('cust-summary-discount').textContent = `-${UTIL.fmtPrice(discount)}`;
+  document.getElementById('cust-summary-total').textContent = UTIL.fmtPrice(total);
+}
+
+function submitCustBooking(event) {
+  event.preventDefault();
+  if (!activeCustRoom) return;
+
+  if (selectedCustSlots.length === 0) {
+    showToast('⚠️ Vui lòng chọn ít nhất một khung giờ!', 'error');
+    return;
+  }
+
+  const name = document.getElementById('cust-book-name').value.trim();
+  const phone = document.getElementById('cust-book-phone').value.trim();
+
+  if (!name || !phone) {
+    showToast('⚠️ Vui lòng điền đầy đủ tên và số điện thoại!', 'error');
+    return;
+  }
+
+  let subtotal = 0;
+  selectedCustSlots.forEach(slotId => {
+    const slot = DOZY_SLOTS.find(s => s.id === slotId);
+    if (slot) {
+      subtotal += slot.type === 'day' ? activeCustRoom.hourly_price_day : activeCustRoom.hourly_price_night;
+    }
+  });
+
+  const discount = selectedCustSlots.length >= 2 ? Math.round(subtotal * 0.1) : 0;
+  const totalPrice = subtotal - discount;
+  const slotsStr = selectedCustSlots.join(', ');
+
+  const bookingData = {
+    customer_name: name,
+    customer_phone: phone,
+    customer_fb_id: 'cust_web_' + Date.now(),
+    branch: activeCustRoom.branch,
+    branch_name: activeCustRoom.branch_name,
+    room_id: activeCustRoom.room_id,
+    room_name: activeCustRoom.room_name,
+    check_in_date: activeCustDate,
+    check_out_date: activeCustDate, // Same check-out date for single day hourly booking
+    num_guests: 2,
+    total_price: totalPrice,
+    status: 'confirmed',
+    special_requests: `Đặt giờ Dozy Home: Khung giờ [ ${slotsStr} ]`,
+    source: 'website'
+  };
+
+  const booking = DB.createBooking(bookingData);
+  if (booking) {
+    showToast('🎉 Đặt phòng thành công! Lịch phòng đã được cập nhật.', 'success');
+    
+    if (typeof NOTIFICATIONS !== 'undefined' && typeof NOTIFICATIONS.sendAlert === 'function') {
+      NOTIFICATIONS.sendAlert(
+        '🎉 Đặt giờ Dozy Home', 
+        `Khách ${name} đã đặt phòng ${activeCustRoom.room_name} (${activeCustRoom.branch_name}) các khung: ${slotsStr}`, 
+        'green'
+      );
+    }
+
+    closeCustBookingModal();
+    pushToServer();
+    
+    renderCustomerPortal();
+    if (typeof renderBookings === 'function') renderBookings();
+    if (typeof renderDashboard === 'function') renderDashboard();
+  } else {
+    showToast('❌ Đặt phòng không thành công, vui lòng thử lại.', 'error');
+  }
+}
+
+// Helper date generator
+function generateCustDates() {
+  const dates = [];
+  const daysOfWeek = ['Chủ Nhật', 'Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7'];
+  const today = new Date();
+  for (let i = 0; i < 7; i++) {
+    const d = new Date();
+    d.setDate(today.getDate() + i);
+    const dateStr = d.toISOString().split('T')[0];
+    
+    let headerText = daysOfWeek[d.getDay()];
+    if (i === 0) headerText = 'Hôm nay';
+    
+    const parts = dateStr.split('-');
+    const bodyText = `${parts[2]}/${parts[1]}`;
+    
+    dates.push({ dateStr, headerText, bodyText });
+  }
+  return dates;
+}
+
+// Carousel controls
+function slidePrev() {
+  const slides = document.querySelectorAll('.cust-modal-slide');
+  if (slides.length <= 1) return;
+  currentSlideIndex = (currentSlideIndex - 1 + slides.length) % slides.length;
+  updateCarouselUI();
+}
+
+function slideNext() {
+  const slides = document.querySelectorAll('.cust-modal-slide');
+  if (slides.length <= 1) return;
+  currentSlideIndex = (currentSlideIndex + 1) % slides.length;
+  updateCarouselUI();
+}
+
+function goToSlide(index) {
+  currentSlideIndex = index;
+  updateCarouselUI();
+}
+
+function updateCarouselUI() {
+  const container = document.getElementById('cust-modal-slides');
+  if (!container) return;
+  container.style.transform = `translateX(-${currentSlideIndex * 100}%)`;
+  
+  const dots = document.querySelectorAll('#cust-modal-dots .cust-dot');
+  dots.forEach((dot, idx) => {
+    if (idx === currentSlideIndex) dot.classList.add('active');
+    else dot.classList.remove('active');
+  });
+}
+
+// Horizontal scroll buttons
+function scrollDatesLeft() {
+  const container = document.getElementById('cust-modal-dates-container');
+  if (container) container.scrollLeft -= 150;
+}
+
+// Horizontal scroll buttons
+function scrollDatesRight() {
+  const container = document.getElementById('cust-modal-dates-container');
+  if (container) container.scrollLeft += 150;
+}
+
+// Bind to window for HTML accessibility
+window.openCustBookingModal = openCustBookingModal;
+window.closeCustBookingModal = closeCustBookingModal;
+window.selectCustDate = selectCustDate;
+window.toggleCustSlot = toggleCustSlot;
+window.submitCustBooking = submitCustBooking;
+window.slidePrev = slidePrev;
+window.slideNext = slideNext;
+window.goToSlide = goToSlide;
+window.scrollDatesLeft = scrollDatesLeft;
+window.scrollDatesRight = scrollDatesRight;
+window.renderCustomerPortal = renderCustomerPortal;
+

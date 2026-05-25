@@ -19,7 +19,8 @@ const CustomerView = {
       const subImage1 = r.images[1] || 'images/room_1_bath.png';
       const subImage2 = r.images[2] || r.images[0] || 'images/room_1_main.png';
 
-      const priceK = Math.round(r.hourly_price_day / 1000) + 'k';
+      const minPrice = r.slot_prices ? Math.min(...Object.values(r.slot_prices)) : (r.hourly_price_day || 239000);
+      const priceK = Math.round(minPrice / 1000) + 'k';
 
       const amenityIcons = {
         'Bếp tự nấu': '🍳',
@@ -99,7 +100,8 @@ const CustomerView = {
     // Price banner
     const banner = document.getElementById('cust-modal-price-banner');
     if (banner) {
-      banner.textContent = `GIÁ CHỈ TỪ ${UTIL.fmtPrice(r.hourly_price_day)}/3H`;
+      const minPrice = r.slot_prices ? Math.min(...Object.values(r.slot_prices)) : (r.hourly_price_day || 239000);
+      banner.textContent = `GIÁ CHỈ TỪ ${UTIL.fmtPrice(minPrice)}/3H`;
     }
 
     // Setup date picker carousel
@@ -143,7 +145,8 @@ const CustomerView = {
     grid.innerHTML = DOZY_SLOTS.map(slot => {
       const isBooked = CustomerController.isSlotBooked(activeCustRoom.room_id, activeCustDate, slot.id);
       const isSelected = selectedCustSlots.includes(slot.id);
-      const price = slot.type === 'day' ? activeCustRoom.hourly_price_day : activeCustRoom.hourly_price_night;
+      const price = (activeCustRoom.slot_prices && activeCustRoom.slot_prices[slot.id]) 
+        || (slot.type === 'day' ? activeCustRoom.hourly_price_day : activeCustRoom.hourly_price_night);
 
       let cls = 'available';
       let disabledAttr = '';
@@ -172,7 +175,8 @@ const CustomerView = {
     selectedCustSlots.forEach(slotId => {
       const slot = DOZY_SLOTS.find(s => s.id === slotId);
       if (slot) {
-        subtotal += slot.type === 'day' ? activeCustRoom.hourly_price_day : activeCustRoom.hourly_price_night;
+        subtotal += (activeCustRoom.slot_prices && activeCustRoom.slot_prices[slotId])
+          || (slot.type === 'day' ? activeCustRoom.hourly_price_day : activeCustRoom.hourly_price_night);
       }
     });
 

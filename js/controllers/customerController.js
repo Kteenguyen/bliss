@@ -59,7 +59,8 @@ const CustomerController = {
     selectedCustSlots.forEach(slotId => {
       const slot = DOZY_SLOTS.find(s => s.id === slotId);
       if (slot) {
-        subtotal += slot.type === 'day' ? activeCustRoom.hourly_price_day : activeCustRoom.hourly_price_night;
+        subtotal += (activeCustRoom.slot_prices && activeCustRoom.slot_prices[slotId])
+          || (slot.type === 'day' ? activeCustRoom.hourly_price_day : activeCustRoom.hourly_price_night);
       }
     });
 

@@ -582,20 +582,43 @@
         </div>
       </div>
 
-      <div class="form-row">
-        <div class="form-group flex-1">
-          <label class="form-label" for="room-hourly-day">Giá giờ ngày Dozy (VND/3h) *</label>
-          <input type="number" id="room-hourly-day" class="form-input" min="0" required placeholder="239000" />
-        </div>
-        <div class="form-group flex-1">
-          <label class="form-label" for="room-hourly-night">Giá qua đêm Dozy (VND) *</label>
-          <input type="number" id="room-hourly-night" class="form-input" min="0" required placeholder="359000" />
+      <div class="form-group">
+        <label class="form-label" style="margin-bottom: 0.5rem; color: #fed7aa; font-weight: 700;">Bảng giá theo từng khung giờ (VND) *</label>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 0.75rem;">
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label" style="font-size: 0.7rem; color: var(--text-secondary);" for="room-hourly-slot-1">08:00 - 11:00</label>
+            <input type="number" id="room-hourly-slot-1" class="form-input" min="0" required placeholder="239000" />
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label" style="font-size: 0.7rem; color: var(--text-secondary);" for="room-hourly-slot-2">11:30 - 14:30</label>
+            <input type="number" id="room-hourly-slot-2" class="form-input" min="0" required placeholder="249000" />
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label" style="font-size: 0.7rem; color: var(--text-secondary);" for="room-hourly-slot-3">15:00 - 18:00</label>
+            <input type="number" id="room-hourly-slot-3" class="form-input" min="0" required placeholder="239000" />
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label" style="font-size: 0.7rem; color: var(--text-secondary);" for="room-hourly-slot-4">18:30 - 21:30</label>
+            <input type="number" id="room-hourly-slot-4" class="form-input" min="0" required placeholder="259000" />
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label" style="font-size: 0.7rem; color: var(--text-secondary);" for="room-hourly-slot-5">22:00 - 08:00 (Đêm)</label>
+            <input type="number" id="room-hourly-slot-5" class="form-input" min="0" required placeholder="359000" />
+          </div>
         </div>
       </div>
 
       <div class="form-group">
-        <label class="form-label" for="room-images-input">Đường dẫn hình ảnh (Phân cách bằng dấu phẩy)</label>
-        <input type="text" id="room-images-input" class="form-input" placeholder="images/room_1_main.png, images/room_1_bath.png" />
+        <label class="form-label" style="color: #fed7aa; font-weight: 700;">Quản lý Hình ảnh Room Gallery (Thêm / Xóa trực quan)</label>
+        <div id="room-images-visual-list" style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.5rem; min-height: 60px; padding: 0.5rem; background: rgba(255,255,255,0.03); border: 1px dashed rgba(255,255,255,0.1); border-radius: 6px; align-items: center;">
+          <!-- Visual thumbnails will go here -->
+        </div>
+        <div style="display: flex; gap: 0.5rem;">
+          <input type="text" id="room-image-add-input" class="form-input" style="flex: 1; margin-bottom: 0;" placeholder="Nhập link/đường dẫn ảnh mới..." />
+          <button type="button" id="room-image-add-btn" onclick="RoomController.addImageUrl()" class="btn btn-secondary" style="padding: 0 1rem; height: 38px; display: flex; align-items: center; justify-content: center; gap: 0.25rem; background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.12);">
+            <span>➕</span> Thêm
+          </button>
+        </div>
       </div>
 
       <div class="form-group">

@@ -129,16 +129,29 @@ const RoomController = {
   },
 
   deleteRoomAction(id) {
-    if (confirm('Bạn có chắc chắn muốn xoá phòng này khỏi hệ thống?')) {
-      const res = DB.deleteRoom(id, true); // force hard delete for demo
+    if (confirm('Bạn có chắc chắn muốn xoá phòng này?\n\nNếu phòng đang có booking, nó sẽ được ẩn (có thể khôi phục).\nNếu không có booking, sẽ xoá vĩnh viễn.')) {
+      // Try soft-delete first; if no active bookings, the force param won't matter
+      const res = DB.deleteRoom(id, false); // soft-delete (sets inactive)
       if (res && res.error) {
         showToast('⚠️ ' + res.error, 'error');
       } else {
-        showToast('🗑️ Đã xoá phòng thành công!', 'success');
+        showToast('🔴 Phòng đã được ẩn (Inactive). Nhấn ♻️ để khôi phục.', 'info');
         RoomsView.render();
         DashboardView.render();
         AppController.pushToServer();
       }
+    }
+  },
+
+  restoreRoomAction(id) {
+    const room = DB.getRoom(id);
+    if (!room) return;
+    if (confirm(`Khôi phục phòng "${room.room_name}" về trạng thái hoạt động?`)) {
+      DB.restoreRoom(id);
+      showToast(`✅ Phòng "${room.room_name}" đã được khôi phục!`, 'success');
+      RoomsView.render();
+      DashboardView.render();
+      AppController.pushToServer();
     }
   }
 };

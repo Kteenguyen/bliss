@@ -32,10 +32,15 @@ const AppController = {
   },
 
   async syncWithServer() {
+    // Update sync status UI
+    const syncIcon = document.getElementById('sync-status-icon');
+    const syncText = document.getElementById('sync-status-text');
+    if (syncIcon) syncIcon.textContent = '⏳';
+    if (syncText) syncText.textContent = 'Đang đồng bộ...';
     try {
       const botUrl = getBotUrl();
       const res = await fetch(`${botUrl}/api/db`);
-      if (!res.ok) return;
+      if (!res.ok) throw new Error('Server không phản hồi');
       const serverData = await res.json();
       
       // Merge settings
@@ -113,8 +118,23 @@ const AppController = {
       
       // Re-render active views
       this.refreshCurrentView();
+
+      // Update sync status UI — success
+      if (syncIcon) syncIcon.textContent = '✅';
+      if (syncText) syncText.textContent = 'Đã đồng bộ';
+      setTimeout(() => {
+        if (syncIcon) syncIcon.textContent = '🔄';
+        if (syncText) syncText.textContent = 'Đồng bộ bot server';
+      }, 3000);
     } catch (e) {
       console.warn('⚠️ Không thể kết nối với bot server cục bộ:', e.message);
+      // Update sync status UI — offline
+      if (syncIcon) syncIcon.textContent = '⚡';
+      if (syncText) syncText.textContent = 'Bot offline (demo local)';
+      setTimeout(() => {
+        if (syncIcon) syncIcon.textContent = '🔄';
+        if (syncText) syncText.textContent = 'Đồng bộ bot server';
+      }, 4000);
     }
   },
 
@@ -162,6 +182,42 @@ const AppController = {
     document.getElementById('menu-toggle')?.addEventListener('click', () => {
       document.getElementById('sidebar').classList.toggle('open');
     });
+  },
+
+  // ─── QUICK THEME TOGGLE ─────────────────────────────────────
+  quickToggleTheme() {
+    const isLight = document.body.classList.toggle('light-beige');
+    const theme = isLight ? 'light-beige' : 'dark';
+    // Persist to settings
+    const s = DB.getSettings();
+    s.theme = theme;
+    DB.saveSettings(s);
+    // Sync the Settings page dropdown if visible
+    const dropdown = document.getElementById('settings-theme');
+    if (dropdown) dropdown.value = theme;
+    // Update toggle button UI
+    this.updateThemeToggleUI(isLight);
+    AppController.pushToServer();
+  },
+
+  updateThemeToggleUI(isLight) {
+    const icon = document.getElementById('theme-toggle-icon');
+    const label = document.getElementById('theme-toggle-label');
+    const btn = document.getElementById('btn-quick-theme-toggle');
+    if (!icon || !label || !btn) return;
+    if (isLight) {
+      icon.textContent = '☀️';
+      label.textContent = 'Light Mode';
+      btn.style.background = 'rgba(150,114,75,0.12)';
+      btn.style.borderColor = 'rgba(150,114,75,0.3)';
+      btn.style.color = '#96724b';
+    } else {
+      icon.textContent = '🌙';
+      label.textContent = 'Dark Mode';
+      btn.style.background = 'rgba(255,255,255,0.05)';
+      btn.style.borderColor = 'rgba(255,255,255,0.1)';
+      btn.style.color = '';
+    }
   }
 };
 
@@ -183,8 +239,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const settings = DB.getSettings();
   if (settings.theme === 'light-beige') {
     document.body.classList.add('light-beige');
+    AppController.updateThemeToggleUI(true);
   } else {
     document.body.classList.remove('light-beige');
+    AppController.updateThemeToggleUI(false);
   }
 
   AppController.navigateTo('dashboard');

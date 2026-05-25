@@ -22,11 +22,14 @@ const RoomsView = {
       <div class="room-card ${isOccupied ? 'occupied' : ''} ${isInactive ? 'inactive' : ''}">
         <div class="room-card-actions">
           <button class="btn-icon btn-icon-edit" onclick="RoomController.openEditRoomModal('${r.room_id}')" title="Sửa phòng">✏️</button>
-          <button class="btn-icon btn-icon-delete" onclick="RoomController.deleteRoomAction('${r.room_id}')" title="Xoá phòng">🗑️</button>
+          ${isInactive
+            ? `<button class="btn-icon" onclick="RoomController.restoreRoomAction('${r.room_id}')" title="Khôi phục phòng" style="background:rgba(16,185,129,0.15);border-color:rgba(16,185,129,0.3);">♻️</button>`
+            : `<button class="btn-icon btn-icon-delete" onclick="RoomController.deleteRoomAction('${r.room_id}')" title="Xoá phòng">🗑️</button>`}
         </div>
         <div class="room-card-image" style="width:100%; height:130px; border-radius:6px; overflow:hidden; margin-bottom:0.75rem; border:1px solid rgba(255,255,255,0.08); position:relative;">
           <img src="${previewImage}" alt="${r.room_name}" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='images/room_1_main.png'" />
           <div style="position:absolute; top:8px; left:8px; font-size:1.2rem; background:rgba(0,0,0,0.5); width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; backdrop-filter:blur(4px);">${r.emoji || '🏠'}</div>
+          <div style="position:absolute; top:8px; right:8px; background:rgba(0,0,0,0.6); color:#fbbf24; font-size:0.6rem; padding:2px 6px; border-radius:4px; font-weight:700;">${r.images && r.images.length > 1 ? r.images.length + ' ảnh' : ''}</div>
         </div>
         <div class="room-header">
           <h3 class="room-name">${r.room_name}</h3>
@@ -41,6 +44,7 @@ const RoomsView = {
           <span>📅 Ngày thường: <strong>${UTIL.fmtPrice(r.base_price_weekday)}</strong></span>
           <span>🎉 Cuối tuần: <strong>${UTIL.fmtPrice(r.base_price_weekend)}</strong></span>
           <span>👥 Sức chứa: <strong>${r.capacity} khách</strong></span>
+          <span>⏰ Giờ: <strong>${UTIL.fmtPrice(r.slot_prices?.['08:00 - 11:00'] || r.hourly_price_day || 0)}/3h</strong></span>
         </div>
         <div class="room-status ${isInactive ? 'status-occupied' : (isOccupied ? 'status-occupied' : 'status-free')}">
           ${isInactive ? '🔴 Ngừng hoạt động' : (isOccupied ? '🔴 Đang có khách' : '🟢 Còn trống')}

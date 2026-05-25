@@ -52,6 +52,17 @@
     </div>
 
     <div class="sidebar-footer">
+      <button id="btn-quick-theme-toggle" onclick="AppController.quickToggleTheme()" title="Chuyển giao diện sáng/tối" style="
+        width: 100%; display: flex; align-items: center; gap: 0.6rem;
+        background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 8px; padding: 0.5rem 0.75rem; cursor: pointer;
+        color: var(--text-secondary); font-size: 0.78rem; font-weight: 600;
+        transition: all 0.25s ease; margin-bottom: 0.6rem; font-family: inherit;
+      ">
+        <span id="theme-toggle-icon">🌙</span>
+        <span id="theme-toggle-label">Dark Mode</span>
+        <span style="margin-left:auto; font-size:0.65rem; opacity:0.6;">Đổi</span>
+      </button>
       <div class="version">v1.0.0 — Demo Build</div>
       <div>Chi phí: <strong style="color:var(--success)">$0/tháng</strong> ✨</div>
     </div>
@@ -115,6 +126,32 @@
           </div>
           <div class="kpi-value" id="stat-checkin">—</div>
           <div class="kpi-sub">Auto reminder sẽ gửi lúc 9:00 SA</div>
+        </div>
+        <div class="kpi-card" style="border-top: 3px solid #f87171;">
+          <div class="kpi-header">
+            <span class="kpi-label">Check-out hôm nay</span>
+            <span class="kpi-icon">🏁</span>
+          </div>
+          <div class="kpi-value" id="stat-checkout" style="color:#f87171;">—</div>
+          <div class="kpi-sub">Phòng sẽ trống sau khi check-out</div>
+        </div>
+      </div>
+
+      <!-- Mini stats row -->
+      <div style="display:flex; gap:0.75rem; margin-bottom:1.5rem; flex-wrap:wrap;">
+        <div style="display:flex; align-items:center; gap:0.5rem; background:var(--bg-card); border:1px solid var(--border); border-radius:8px; padding:0.5rem 1rem; font-size:0.82rem;">
+          <span>📊</span>
+          <span style="color:var(--text-secondary);">Tổng booking:</span>
+          <strong id="stat-total-bookings">—</strong>
+        </div>
+        <div style="display:flex; align-items:center; gap:0.5rem; background:var(--bg-card); border:1px solid var(--border); border-radius:8px; padding:0.5rem 1rem; font-size:0.82rem;">
+          <span>🏠</span>
+          <span style="color:var(--text-secondary);">Phòng đang hoạt động:</span>
+          <strong id="stat-total-rooms">—</strong>
+        </div>
+        <div style="display:flex; align-items:center; gap:0.5rem; background:var(--bg-card); border:1px solid var(--border); border-radius:8px; padding:0.5rem 1rem; font-size:0.82rem; cursor:pointer;" onclick="AppController.syncWithServer()" title="Đồng bộ với bot server">
+          <span id="sync-status-icon">🔄</span>
+          <span id="sync-status-text" style="color:var(--text-secondary);">Đồng bộ bot server</span>
         </div>
       </div>
 
@@ -182,8 +219,13 @@
             <button class="quick-chip">Giá phòng 2 người Hội An 28/6</button>
             <button class="quick-chip">Mã cửa check-in</button>
             <button class="quick-chip">WiFi homestay</button>
-            <button class="quick-chip">Máy lạnh không hoạt động</button>
             <button class="quick-chip">Đón sân bay</button>
+            <button class="quick-chip">Bãi đỗ xe</button>
+            <button class="quick-chip">Chính sách hoàn tiền</button>
+            <button class="quick-chip">Bữa sáng có không?</button>
+            <button class="quick-chip">Tour tham quan</button>
+            <button class="quick-chip">Thanh toán thế nào?</button>
+            <button class="quick-chip">Máy lạnh không hoạt động</button>
           </div>
 
           <!-- Messages -->
@@ -241,6 +283,22 @@
               3. Chọn phòng (gõ "1")<br>
               4. Xác nhận (gõ "OK")<br>
               → Booking tự động tạo! 🎉
+            </div>
+            <div style="margin-top:0.75rem;">
+              <button class="btn btn-ghost text-sm" style="width:100%;font-size:0.72rem;" onclick="CHATBOT.state='IDLE';CHATBOT.context={};showToast('🔄 Đã reset hội thoại','info');">🔄 Reset hội thoại</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">❓ Câu hỏi thường gặp</div>
+            <div style="display:flex;flex-direction:column;gap:0.4rem;font-size:0.75rem;">
+              <div style="padding:0.35rem 0.6rem;background:rgba(99,102,241,0.08);border-radius:6px;cursor:pointer;" onclick="document.getElementById('chat-input').value='Bãi đỗ xe có không?';document.getElementById('chat-send').click();">🚗 Bãi đỗ xe?</div>
+              <div style="padding:0.35rem 0.6rem;background:rgba(99,102,241,0.08);border-radius:6px;cursor:pointer;" onclick="document.getElementById('chat-input').value='Bữa sáng có miễn phí không?';document.getElementById('chat-send').click();">🍳 Bữa sáng?</div>
+              <div style="padding:0.35rem 0.6rem;background:rgba(99,102,241,0.08);border-radius:6px;cursor:pointer;" onclick="document.getElementById('chat-input').value='Có nhận thú cưng không?';document.getElementById('chat-send').click();">🐾 Thú cưng?</div>
+              <div style="padding:0.35rem 0.6rem;background:rgba(99,102,241,0.08);border-radius:6px;cursor:pointer;" onclick="document.getElementById('chat-input').value='Chính sách hoàn tiền khi huỷ?';document.getElementById('chat-send').click();">💰 Huỷ hoàn tiền?</div>
+              <div style="padding:0.35rem 0.6rem;background:rgba(99,102,241,0.08);border-radius:6px;cursor:pointer;" onclick="document.getElementById('chat-input').value='Thanh toán bằng gì?';document.getElementById('chat-send').click();">💳 Thanh toán?</div>
+              <div style="padding:0.35rem 0.6rem;background:rgba(99,102,241,0.08);border-radius:6px;cursor:pointer;" onclick="document.getElementById('chat-input').value='Có tour tham quan không?';document.getElementById('chat-send').click();">🗺️ Tour?</div>
+              <div style="padding:0.35rem 0.6rem;background:rgba(99,102,241,0.08);border-radius:6px;cursor:pointer;" onclick="document.getElementById('chat-input').value='Có được hút thuốc không?';document.getElementById('chat-send').click();">🚭 Hút thuốc?</div>
             </div>
           </div>
 

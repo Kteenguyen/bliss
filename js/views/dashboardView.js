@@ -11,29 +11,40 @@ const DashboardView = {
     const statRevenue = document.getElementById('stat-revenue');
     const statOccupancy = document.getElementById('stat-occupancy');
     const statCheckin = document.getElementById('stat-checkin');
+    const statCheckout = document.getElementById('stat-checkout');
+    const statTotalBookings = document.getElementById('stat-total-bookings');
+    const statTotalRooms = document.getElementById('stat-total-rooms');
 
     if (statBookings) statBookings.textContent = stats.activeBookings;
     if (statRevenue) statRevenue.textContent = UTIL.fmtPrice(stats.revenue);
     if (statOccupancy) statOccupancy.textContent = stats.occupancyRate + '%';
     if (statCheckin) statCheckin.textContent = stats.checkinTomorrow;
+    if (statCheckout) statCheckout.textContent = stats.checkoutToday;
+    if (statTotalBookings) statTotalBookings.textContent = stats.totalBookings + ' booking';
+    if (statTotalRooms) statTotalRooms.textContent = stats.totalRooms + ' phòng';
 
     // Occupancy bar
     const bar = document.getElementById('occupancy-bar');
     if (bar) bar.style.width = stats.occupancyRate + '%';
 
-    // Branch breakdown
+    // Branch breakdown — use actual roomsPerBranch counts
     const branches = ['da_lat', 'hoi_an', 'nha_trang'];
     const branchNames = { da_lat: '🏔️ Đà Lạt', hoi_an: '🏮 Hội An', nha_trang: '🌊 Nha Trang' };
     const branchEl = document.getElementById('branch-stats');
     if (branchEl) {
-      branchEl.innerHTML = branches.map(b => `
+      branchEl.innerHTML = branches.map(b => {
+        const total = stats.roomsPerBranch[b] || 1;
+        const active = stats.byBranch[b] || 0;
+        const pct = Math.round((active / total) * 100);
+        return `
         <div class="branch-stat">
           <span class="branch-name">${branchNames[b]}</span>
           <div class="branch-bar-wrap">
-            <div class="branch-bar" style="width:${Math.round((stats.byBranch[b] / 2) * 100)}%"></div>
+            <div class="branch-bar" style="width:${pct}%"></div>
           </div>
-          <span class="branch-count">${stats.byBranch[b]}/2 phòng</span>
-        </div>`).join('');
+          <span class="branch-count">${active}/${total} phòng</span>
+        </div>`;
+      }).join('');
     }
 
     // Recent bookings
@@ -46,6 +57,7 @@ const DashboardView = {
             <span class="recent-id">#${b.booking_id}</span>
             <span class="recent-name">${b.customer_name}</span>
             <span class="recent-room">${b.room_name}</span>
+            ${b.special_requests ? `<span title="${b.special_requests}" style="font-size:0.68rem;color:#fbbf24;cursor:help;">📝</span>` : ''}
           </div>
           <div class="recent-right">
             ${UTIL.statusBadge(b.status)}

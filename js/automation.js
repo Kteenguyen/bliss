@@ -83,6 +83,7 @@ const AUTOMATION = {
     this.renderScenarios();
 
     const bookings = DB.getBookings();
+    const settings = DB.getSettings();
     let result = '';
 
     setTimeout(() => {
@@ -99,6 +100,9 @@ const AUTOMATION = {
               DB.addActivity({ type: 'automation', msg: `📩 Check-in reminder → ${b.customer_name} (${b.booking_id})`, color: 'blue' });
             });
             result = `Đã gửi ${targets.length} tin nhắn check-in thành công!`;
+            if (settings.webhook_s06) {
+              this._triggerMakeWebhook(settings.webhook_s06, { scenario: 'S06', bookings: targets });
+            }
           }
           this._addLog(scenarioId, '✅ ' + result, 'success');
           break;
@@ -116,6 +120,9 @@ const AUTOMATION = {
               DB.addActivity({ type: 'automation', msg: `⭐ Review request → ${b.customer_name} (${b.booking_id})`, color: 'yellow' });
             });
             result = `Đã gửi ${targets.length} yêu cầu đánh giá!`;
+            if (settings.webhook_s07) {
+              this._triggerMakeWebhook(settings.webhook_s07, { scenario: 'S07', bookings: targets });
+            }
           }
           this._addLog(scenarioId, '✅ ' + result, 'success');
           break;
@@ -123,6 +130,7 @@ const AUTOMATION = {
         case 'S08': {
           let conflicts = 0;
           const roomGroups = {};
+          const conflictTargets = [];
           bookings.filter(b => ['confirmed', 'checked_in'].includes(b.status))
             .forEach(b => { (roomGroups[b.room_id] = roomGroups[b.room_id] || []).push(b); });
           for (const [roomId, bList] of Object.entries(roomGroups)) {
@@ -131,12 +139,16 @@ const AUTOMATION = {
                 const a = bList[i], b = bList[j];
                 if (!(a.check_out_date <= b.check_in_date || a.check_in_date >= b.check_out_date)) {
                   conflicts++;
+                  conflictTargets.push({ a, b });
                   this._addLog(scenarioId, `⚠️ CONFLICT: ${a.room_name} — ${a.booking_id} vs ${b.booking_id}`, 'error');
                 }
               }
             }
           }
           result = conflicts === 0 ? `Không phát hiện conflict nào. Tất cả ${bookings.length} booking hợp lệ.` : `⚠️ Phát hiện ${conflicts} xung đột!`;
+          if (settings.webhook_s08) {
+            this._triggerMakeWebhook(settings.webhook_s08, { scenario: 'S08', conflicts: conflictTargets, totalBookings: bookings.length });
+          }
           this._addLog(scenarioId, '🛡️ ' + result, conflicts ? 'error' : 'success');
           break;
         }
@@ -161,6 +173,25 @@ const AUTOMATION = {
     const log = { id: Date.now(), scenarioId, message, type, time: new Date().toISOString() };
     this.logs.unshift(log);
     this.renderLogs();
+  },
+
+  async _triggerMakeWebhook(url, payload) {
+    const scenarioId = payload.scenario;
+    try {
+      this._addLog(scenarioId, `📡 Đang gọi webhook Make.com...`, 'info');
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (res.ok) {
+        this._addLog(scenarioId, `✅ Make.com Webhook phản hồi thành công!`, 'success');
+      } else {
+        this._addLog(scenarioId, `❌ Make.com Webhook báo lỗi: ${res.status}`, 'error');
+      }
+    } catch (e) {
+      this._addLog(scenarioId, `❌ Lỗi kết nối Make.com Webhook: ${e.message}`, 'error');
+    }
   },
 
   renderScenarios() {

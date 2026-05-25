@@ -1,6 +1,14 @@
 // ─── SERVER SYNC LOGIC ──────────────────────────────────────
+function getBotUrl() {
+  const localSettings = JSON.parse(localStorage.getItem('bliss_settings') || '{}');
+  let url = localSettings.bot_url || 'http://localhost:3000';
+  if (url.endsWith('/')) url = url.slice(0, -1);
+  return url;
+}
+
 async function pushToServer() {
   try {
+    const botUrl = getBotUrl();
     const data = {
       bliss_rooms: localStorage.getItem('bliss_rooms'),
       bliss_bookings: localStorage.getItem('bliss_bookings'),
@@ -8,7 +16,7 @@ async function pushToServer() {
       bliss_activity: localStorage.getItem('bliss_activity'),
       bliss_counters: localStorage.getItem('bliss_counters')
     };
-    await fetch('http://localhost:3000/api/db', {
+    await fetch(`${botUrl}/api/db`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data)
@@ -20,7 +28,8 @@ async function pushToServer() {
 
 async function syncWithServer() {
   try {
-    const res = await fetch('http://localhost:3000/api/db');
+    const botUrl = getBotUrl();
+    const res = await fetch(`${botUrl}/api/db`);
     if (!res.ok) return;
     const serverData = await res.json();
     
@@ -36,6 +45,18 @@ async function syncWithServer() {
       }
       if (serverSettings.fb_pageid && !localSettings.fb_pageid) {
         localSettings.fb_pageid = serverSettings.fb_pageid;
+      }
+      if (serverSettings.bot_url && !localSettings.bot_url) {
+        localSettings.bot_url = serverSettings.bot_url;
+      }
+      if (serverSettings.webhook_s06 && !localSettings.webhook_s06) {
+        localSettings.webhook_s06 = serverSettings.webhook_s06;
+      }
+      if (serverSettings.webhook_s07 && !localSettings.webhook_s07) {
+        localSettings.webhook_s07 = serverSettings.webhook_s07;
+      }
+      if (serverSettings.webhook_s08 && !localSettings.webhook_s08) {
+        localSettings.webhook_s08 = serverSettings.webhook_s08;
       }
       localStorage.setItem('bliss_settings', JSON.stringify(localSettings));
     }
@@ -419,10 +440,19 @@ function renderSettings() {
   const pinEl = document.getElementById('settings-pin');
   const fbPageEl = document.getElementById('settings-fb-pageid');
   const fbTokenEl = document.getElementById('settings-fb-token');
+  const botUrlEl = document.getElementById('settings-bot-url');
+  const s06El = document.getElementById('settings-webhook-s06');
+  const s07El = document.getElementById('settings-webhook-s07');
+  const s08El = document.getElementById('settings-webhook-s08');
+  
   if (el) el.value = s.gemini_key || '';
   if (pinEl) pinEl.value = s.pin_prefix || '6789';
   if (fbPageEl) fbPageEl.value = s.fb_pageid || '';
   if (fbTokenEl) fbTokenEl.value = s.fb_token || '';
+  if (botUrlEl) botUrlEl.value = s.bot_url || 'http://localhost:3000';
+  if (s06El) s06El.value = s.webhook_s06 || '';
+  if (s07El) s07El.value = s.webhook_s07 || '';
+  if (s08El) s08El.value = s.webhook_s08 || '';
 }
 
 function setupSettings() {
@@ -431,12 +461,20 @@ function setupSettings() {
     const pin = document.getElementById('settings-pin')?.value?.trim() || '6789';
     const fbPage = document.getElementById('settings-fb-pageid')?.value?.trim() || '';
     const fbToken = document.getElementById('settings-fb-token')?.value?.trim() || '';
+    const botUrl = document.getElementById('settings-bot-url')?.value?.trim() || 'http://localhost:3000';
+    const s06 = document.getElementById('settings-webhook-s06')?.value?.trim() || '';
+    const s07 = document.getElementById('settings-webhook-s07')?.value?.trim() || '';
+    const s08 = document.getElementById('settings-webhook-s08')?.value?.trim() || '';
     
     DB.saveSettings({ 
       gemini_key: key, 
       pin_prefix: pin,
       fb_pageid: fbPage,
-      fb_token: fbToken
+      fb_token: fbToken,
+      bot_url: botUrl,
+      webhook_s06: s06,
+      webhook_s07: s07,
+      webhook_s08: s08
     });
     showToast('✅ Cài đặt đã được lưu!', 'success');
     await pushToServer();

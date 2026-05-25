@@ -54,7 +54,7 @@ const RoomsView = {
     const list = document.getElementById('room-images-visual-list');
     if (!list) return;
     if (!images || images.length === 0) {
-      list.innerHTML = `<span style="color:var(--text-muted); font-size:0.75rem;">Chưa có hình ảnh nào. Thêm URL ở bên dưới!</span>`;
+      list.innerHTML = `<span style="color:var(--text-secondary); font-size:0.75rem;">Chưa có hình ảnh nào. Thêm URL ở bên dưới!</span>`;
       return;
     }
     list.innerHTML = images.map((url, idx) => `

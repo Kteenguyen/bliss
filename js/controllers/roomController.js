@@ -31,6 +31,36 @@ const RoomController = {
     RoomsView.renderImagesVisualList(this.tempRoomImages);
   },
 
+  async handleImagesUpload(event) {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
+
+    showToast(`⏳ Đang tải lên ${files.length} ảnh...`, 'info');
+    
+    const readPromises = Array.from(files).map(file => {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          resolve(e.target.result); // Base64 Data URL
+        };
+        reader.onerror = () => {
+          resolve(null);
+        };
+        reader.readAsDataURL(file);
+      });
+    });
+
+    const base64Images = await Promise.all(readPromises);
+    const validImages = base64Images.filter(Boolean);
+
+    this.tempRoomImages.push(...validImages);
+    RoomsView.renderImagesVisualList(this.tempRoomImages);
+    
+    // Reset file input
+    event.target.value = '';
+    showToast(`✅ Đã thêm thành công ${validImages.length} ảnh!`, 'success');
+  },
+
   deleteImageByIndex(index) {
     this.tempRoomImages.splice(index, 1);
     RoomsView.renderImagesVisualList(this.tempRoomImages);

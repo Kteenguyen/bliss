@@ -13,6 +13,7 @@ const SettingsView = {
     const s06El = document.getElementById('settings-webhook-s06');
     const s07El = document.getElementById('settings-webhook-s07');
     const s08El = document.getElementById('settings-webhook-s08');
+    const themeEl = document.getElementById('settings-theme');
 
     if (el) el.value = s.gemini_key || '';
     if (pinEl) pinEl.value = s.pin_prefix || '6789';
@@ -22,6 +23,7 @@ const SettingsView = {
     if (s06El) s06El.value = s.webhook_s06 || '';
     if (s07El) s07El.value = s.webhook_s07 || '';
     if (s08El) s08El.value = s.webhook_s08 || '';
+    if (themeEl) themeEl.value = s.theme || 'dark';
   }
 };
 

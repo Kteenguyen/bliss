@@ -2,15 +2,73 @@
 // customerView.js — View component for customer booking UI
 // ============================================================
 
+const CUST_LANGS = {
+  vi: {
+    find_room: "Tìm phòng xinh xắn cho bạn",
+    select_branch: "Chọn chi nhánh để khám phá phòng",
+    no_rooms: "Chưa có phòng hoạt động tại chi nhánh này.",
+    price_from: "Giá chỉ từ",
+    book_now: "ĐẶT NGAY ➔",
+    booking_title: "Đặt chỗ",
+    discount_promo: "🎁 Ưu đãi thêm 10% khi đặt từ 2 khung giờ trở lên!",
+    step_1: "1. CHỌN NGÀY NHẬN PHÒNG",
+    step_2: "2. CHỌN CÁC KHUNG GIỜ",
+    today: "Hôm nay",
+    legend_booked: "Đã Đặt",
+    legend_free: "Còn Trống",
+    legend_selecting: "Đang Chọn",
+    label_name: "Tên của bạn *",
+    label_phone: "Số điện thoại *",
+    summary_slots: "Số khung giờ chọn:",
+    summary_slots_unit: "khung",
+    summary_discount: "Khấu trừ giảm giá (10%):",
+    summary_total: "TỔNG THANH TOÁN:",
+    btn_back: "Quay lại",
+    btn_book: "⚡ ĐẶT NGAY"
+  },
+  en: {
+    find_room: "Find a cozy room for yourself",
+    select_branch: "Select branch to explore rooms",
+    no_rooms: "No active rooms in this branch yet.",
+    price_from: "Price from",
+    book_now: "BOOK NOW ➔",
+    booking_title: "Book",
+    discount_promo: "🎁 Extra 10% off when booking 2 or more slots!",
+    step_1: "1. SELECT CHECK-IN DATE",
+    step_2: "2. SELECT TIME SLOTS",
+    today: "Today",
+    legend_booked: "Booked",
+    legend_free: "Available",
+    legend_selecting: "Selecting",
+    label_name: "Your name *",
+    label_phone: "Phone number *",
+    summary_slots: "Selected slots:",
+    summary_slots_unit: "slots",
+    summary_discount: "Discount (10%):",
+    summary_total: "TOTAL PAYMENT:",
+    btn_back: "Back",
+    btn_book: "⚡ BOOK NOW"
+  }
+};
+
 const CustomerView = {
   render() {
+    const lang = document.getElementById('cust-lang-selector')?.value || 'vi';
+    const trans = CUST_LANGS[lang];
+
+    // Translate headers
+    const titleEl = document.querySelector('#view-customer h3');
+    if (titleEl) titleEl.textContent = trans.find_room;
+    const subEl = document.querySelector('#view-customer p');
+    if (subEl) subEl.textContent = trans.select_branch;
+
     const branch = document.getElementById('cust-branch-filter')?.value || 'da_lat';
     const rooms = DB.getRoomsByBranch(branch).filter(r => r.status === 'active');
     const container = document.getElementById('cust-rooms-list');
     if (!container) return;
 
     if (rooms.length === 0) {
-      container.innerHTML = `<div style="text-align:center; color:var(--text-muted); padding:3rem;">Chưa có phòng hoạt động tại chi nhánh này.</div>`;
+      container.innerHTML = `<div style="text-align:center; color:var(--text-muted); padding:3rem;">${trans.no_rooms}</div>`;
       return;
     }
 
@@ -63,12 +121,12 @@ const CustomerView = {
           <div class="cust-room-details">
             <div>
               <h2 class="cust-room-title">${r.emoji || '🏠'} ${r.room_name}</h2>
-              <div class="cust-room-price">Giá chỉ từ ${priceK}/3h</div>
+              <div class="cust-room-price">${trans.price_from} ${priceK}/3h</div>
               <div class="cust-room-amenities">
                 ${amenitiesHtml}
               </div>
             </div>
-            <button class="cust-book-now-btn" onclick="CustomerController.openCustBookingModal('${r.room_id}')">ĐẶT NGAY ➔</button>
+            <button class="cust-book-now-btn" onclick="CustomerController.openCustBookingModal('${r.room_id}')">${trans.book_now}</button>
           </div>
         </div>
       `;
@@ -78,8 +136,25 @@ const CustomerView = {
   openCustBookingModal(r) {
     if (!r) return;
 
-    // Update modal title
+    const lang = document.getElementById('cust-lang-selector')?.value || 'vi';
+    const trans = CUST_LANGS[lang];
+
+    // Update modal text values dynamically
+    document.getElementById('cust-modal-title-text').textContent = trans.booking_title;
     document.getElementById('cust-modal-room-name').textContent = r.room_name;
+    document.getElementById('cust-modal-discount-promo').textContent = trans.discount_promo;
+    document.getElementById('cust-modal-step-1-label').textContent = trans.step_1;
+    document.getElementById('cust-modal-step-2-label').textContent = trans.step_2;
+    document.getElementById('cust-modal-legend-booked').textContent = trans.legend_booked;
+    document.getElementById('cust-modal-legend-free').textContent = trans.legend_free;
+    document.getElementById('cust-modal-legend-selecting').textContent = trans.legend_selecting;
+    document.getElementById('cust-modal-label-name').textContent = trans.label_name;
+    document.getElementById('cust-modal-label-phone').textContent = trans.label_phone;
+    document.getElementById('cust-modal-summary-slots-label').textContent = trans.summary_slots;
+    document.getElementById('cust-modal-summary-discount-label').textContent = trans.summary_discount;
+    document.getElementById('cust-modal-summary-total-label').textContent = trans.summary_total;
+    document.getElementById('cust-modal-btn-back').textContent = trans.btn_back;
+    document.getElementById('cust-modal-btn-submit').textContent = trans.btn_book;
 
     // Render carousel slide photos
     const slidesContainer = document.getElementById('cust-modal-slides');
@@ -88,7 +163,7 @@ const CustomerView = {
       const imgs = r.images && r.images.length > 0 ? r.images : ['images/room_1_main.png', 'images/room_1_bath.png', 'images/room_1_main.png'];
       slidesContainer.innerHTML = imgs.map(img => `
         <div class="cust-modal-slide" style="min-width:100%; height:100%; position:relative;">
-          <img src="${img}" style="width:100%; height:100%; object-fit:cover; display:block;" />
+          <img src="${img}" style="width:100%; height:100%; object-fit:cover; display:block;" onerror="this.src='images/room_1_main.png'" />
         </div>
       `).join('');
 
@@ -101,7 +176,7 @@ const CustomerView = {
     const banner = document.getElementById('cust-modal-price-banner');
     if (banner) {
       const minPrice = r.slot_prices ? Math.min(...Object.values(r.slot_prices)) : (r.hourly_price_day || 239000);
-      banner.textContent = `GIÁ CHỈ TỪ ${UTIL.fmtPrice(minPrice)}/3H`;
+      banner.textContent = `${trans.price_from.toUpperCase()} ${UTIL.fmtPrice(minPrice)}/3H`;
     }
 
     // Setup date picker carousel
@@ -169,6 +244,9 @@ const CustomerView = {
   updateCustSummary() {
     if (!activeCustRoom) return;
 
+    const lang = document.getElementById('cust-lang-selector')?.value || 'vi';
+    const trans = CUST_LANGS[lang];
+
     const count = selectedCustSlots.length;
     let subtotal = 0;
 
@@ -183,7 +261,7 @@ const CustomerView = {
     const discount = count >= 2 ? Math.round(subtotal * 0.1) : 0;
     const total = subtotal - discount;
 
-    document.getElementById('cust-summary-slots-count').textContent = `${count} khung`;
+    document.getElementById('cust-summary-slots-count').textContent = `${count} ${trans.summary_slots_unit}`;
     document.getElementById('cust-summary-discount').textContent = `-${UTIL.fmtPrice(discount)}`;
     document.getElementById('cust-summary-total').textContent = UTIL.fmtPrice(total);
   },

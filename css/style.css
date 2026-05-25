@@ -465,8 +465,8 @@ tr:hover td { background: rgba(255,255,255,0.03); }
 .btn-primary:hover { filter: brightness(1.1); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(99,102,241,0.4); }
 .btn-danger { background: rgba(239,68,68,0.15); color: #f87171; border: 1px solid rgba(239,68,68,0.3); }
 .btn-danger:hover { background: rgba(239,68,68,0.25); }
-.btn-ghost { background: rgba(255,255,255,0.06); color: var(--text-secondary); border: 1px solid var(--border); }
-.btn-ghost:hover { background: rgba(255,255,255,0.1); color: var(--text-primary); }
+.btn-ghost { background: rgba(255,255,255,0.06); color: #b0bec8; border: 1px solid rgba(255,255,255,0.12); }
+.btn-ghost:hover { background: rgba(255,255,255,0.12); color: var(--text-primary); }
 
 /* ─── Filter bar ─────────────────────────────────────────── */
 .filter-bar { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
@@ -817,7 +817,7 @@ option { background: #1a1a2e; }
 }
 .cust-date-header {
   font-size: 0.62rem;
-  color: var(--text-muted);
+  color: #94a3b8; /* was var(--text-muted)=#64748b, contrast too low; upgraded to text-secondary */
   text-transform: uppercase;
   font-weight: 700;
   margin-bottom: 2px;
@@ -828,7 +828,7 @@ option { background: #1a1a2e; }
 .cust-date-body {
   font-size: 0.8rem;
   font-weight: 800;
-  color: #fed7aa;
+  color: #e2c99a; /* was #fed7aa but ensure it contrasts on #292524 */
 }
 .cust-date-btn.active .cust-date-body {
   color: #fff;
@@ -863,10 +863,10 @@ option { background: #1a1a2e; }
 }
 .cust-slot-btn.booked {
   background: #44403c; /* Grey */
-  color: #8c857b;
-  border-color: #292524;
+  color: #a8a09a; /* was #8c857b: contrast only 2.9:1, upgraded for AA */
+  border-color: #57534e;
   cursor: not-allowed;
-  opacity: 0.75;
+  opacity: 0.85;
 }
 .cust-slot-time {
   font-size: 0.78rem;
@@ -907,5 +907,278 @@ option { background: #1a1a2e; }
   .cust-room-amenities {
     grid-template-columns: 1fr;
   }
+}
+
+/* ============================================================
+   🌾 Beige-White Elegant & High-Contrast Style System
+   ============================================================ */
+
+/* High-Contrast Button Secondary Style */
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.14); /* was 0.08: too close to modal bg */
+  color: #e8ecf4; /* was var(--text-primary): make explicit bright */
+  border: 1px solid rgba(255, 255, 255, 0.32) !important; /* was 0.15: too subtle */
+}
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.22);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.48) !important;
+}
+
+/* Beige-White Light Theme Variables Overrides */
+body.light-beige {
+  --bg-base: #faf8f5;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f7f5f0;
+  --bg-sidebar: #f2ede4;
+  --bg-input: #ffffff;
+
+  --primary: #96724b;
+  --primary-light: #b08d66;
+  --primary-dark: #7a5833;
+  --secondary: #767b6e;
+  --accent: #bda282;
+
+  --text-primary: #2b2824;
+  --text-secondary: #6e675f;
+  --text-muted: #a39b93;
+
+  --border: rgba(150, 114, 75, 0.15);
+  --border-focus: rgba(150, 114, 75, 0.6);
+
+  --shadow-card: 0 10px 40px -10px rgba(110, 95, 80, 0.12), 0 1px 3px rgba(110, 95, 80, 0.04);
+  --shadow-glow: 0 0 30px rgba(150, 114, 75, 0.06);
+}
+
+/* Beige Theme Form and Sidebar Override Rules */
+body.light-beige #sidebar {
+  background: var(--bg-sidebar) !important;
+  border-right: 1px solid var(--border) !important;
+}
+body.light-beige .nav-item {
+  color: var(--text-secondary);
+}
+body.light-beige .nav-item.active {
+  background: rgba(150, 114, 75, 0.08) !important;
+  color: var(--primary) !important;
+  border-left-color: var(--primary) !important;
+}
+body.light-beige .nav-item:hover:not(.active) {
+  background: rgba(150, 114, 75, 0.04) !important;
+  color: var(--text-primary);
+}
+body.light-beige .logo-text {
+  color: var(--text-primary) !important;
+}
+body.light-beige .logo-text span {
+  color: var(--primary) !important;
+}
+body.light-beige .version {
+  color: var(--text-muted) !important;
+}
+
+/* Beige Theme Custom Calendar and Slot Styles */
+body.light-beige .cust-date-btn {
+  background: #fbf9f5;
+  border-color: rgba(150, 114, 75, 0.25);
+  color: #2b2824;
+}
+body.light-beige .cust-date-btn.active {
+  background: #96724b;
+  border-color: #7a5833;
+  box-shadow: 0 4px 12px rgba(150, 114, 75, 0.15);
+}
+body.light-beige .cust-date-btn.active .cust-date-header {
+  color: #fcfbf9;
+}
+body.light-beige .cust-date-btn.active .cust-date-body {
+  color: #fff;
+}
+body.light-beige .cust-date-body {
+  color: #96724b;
+}
+
+body.light-beige .cust-slot-btn.available {
+  background: #f5f0e6;
+  color: #96724b;
+  border-color: #eadecd;
+}
+body.light-beige .cust-slot-btn.available:hover {
+  background: #eadecd;
+}
+body.light-beige .cust-slot-btn.selected {
+  background: #96724b;
+  color: #fff;
+  border-color: #7a5833;
+  box-shadow: 0 4px 12px rgba(150, 114, 75, 0.2);
+}
+body.light-beige .cust-slot-btn.booked {
+  background: #eae6dd;
+  color: #a39b93;
+  border-color: #ded9cd;
+}
+
+/* Secondary Button In Beige Theme */
+body.light-beige .btn-secondary {
+  background: #f2ede4;
+  color: #2b2824;
+  border: 1px solid rgba(150, 114, 75, 0.25) !important;
+}
+body.light-beige .btn-secondary:hover {
+  background: #eadecd;
+  color: #000;
+  border-color: rgba(150, 114, 75, 0.4) !important;
+}
+
+/* Customer Booking Modal Beige Style Overrides */
+body.light-beige #cust-booking-modal .modal-content {
+  background: #fdfcf7 !important;
+  border: 1px solid #bda282 !important;
+  box-shadow: 0 10px 40px -10px rgba(110, 95, 80, 0.2) !important;
+}
+body.light-beige #cust-booking-modal .modal-header {
+  border-bottom: 1px solid rgba(150, 114, 75, 0.15) !important;
+}
+body.light-beige #cust-booking-modal h2 {
+  color: #96724b !important;
+}
+body.light-beige #cust-booking-modal .modal-close {
+  color: #96724b !important;
+}
+body.light-beige #cust-booking-modal .form-label {
+  color: #96724b !important;
+}
+body.light-beige #cust-booking-modal .form-input {
+  background: #ffffff !important;
+  color: #2b2824 !important;
+  border-color: rgba(150, 114, 75, 0.25) !important;
+}
+body.light-beige #cust-booking-modal .form-input::placeholder {
+  color: #a39b93 !important;
+}
+body.light-beige #cust-booking-modal #btn-cust-book-submit {
+  background: #96724b !important;
+  border-color: #96724b !important;
+}
+body.light-beige #cust-booking-modal div[style*="background:linear-gradient"] {
+  background: linear-gradient(90deg, #f5f0e6, #eadecd) !important;
+  border: 1px solid rgba(150, 114, 75, 0.2) !important;
+}
+body.light-beige #cust-booking-modal #cust-modal-price-banner {
+  color: #96724b !important;
+}
+body.light-beige #cust-booking-modal div[style*="color:#fed7aa"] {
+  color: #6e675f !important;
+}
+body.light-beige #cust-booking-modal div[style*="background:#292524"] {
+  background: #f2ede4 !important;
+}
+body.light-beige #cust-booking-modal strong[style*="color:#fed7aa"] {
+  color: #2b2824 !important;
+}
+body.light-beige #cust-booking-modal strong[style*="color:#f97316"] {
+  color: #96724b !important;
+}
+body.light-beige #cust-booking-modal span[style*="color:#fed7aa"] {
+  color: #2b2824 !important;
+}
+body.light-beige #cust-booking-modal .form-actions .btn-ghost {
+  border-color: rgba(150, 114, 75, 0.25) !important;
+  color: #6e675f !important;
+}
+body.light-beige #cust-booking-modal .form-actions .btn-ghost:hover {
+  background: #f2ede4 !important;
+  color: #2b2824 !important;
+}
+
+/* Form and Page elements contrast optimization */
+body.light-beige .page-title span {
+  color: var(--primary) !important;
+}
+body.light-beige .kpi-card {
+  box-shadow: 0 4px 20px -5px rgba(110, 95, 80, 0.1) !important;
+}
+body.light-beige .kpi-value {
+  color: var(--text-primary) !important;
+}
+body.light-beige .kpi-sub {
+  color: var(--text-secondary) !important;
+}
+body.light-beige .form-input {
+  background: #ffffff !important;
+  color: #2b2824 !important;
+  border-color: rgba(150, 114, 75, 0.25) !important;
+}
+body.light-beige .form-input:focus {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 2px rgba(150, 114, 75, 0.15) !important;
+}
+body.light-beige #view-customer .customer-header {
+  background: #f2ede4 !important;
+  box-shadow: 0 4px 20px -5px rgba(110, 95, 80, 0.1) !important;
+}
+body.light-beige #view-customer .customer-header span[style*="color:#fed7aa"] {
+  color: #96724b !important;
+}
+body.light-beige #view-customer .card {
+  background: #ffffff !important;
+  border: 1px solid rgba(150, 114, 75, 0.15) !important;
+  border-left: 4px solid #96724b !important;
+}
+body.light-beige #view-customer .card h3 {
+  color: #96724b !important;
+}
+body.light-beige #view-customer select {
+  background: #ffffff !important;
+  color: #96724b !important;
+  border-color: rgba(150, 114, 75, 0.25) !important;
+}
+body.light-beige .cust-room-price {
+  color: #96724b !important;
+}
+body.light-beige .cust-collage-container {
+  border-right: 1px solid rgba(150, 114, 75, 0.15) !important;
+}
+body.light-beige .cust-book-now-btn {
+  background: #96724b !important;
+}
+body.light-beige .cust-book-now-btn:hover {
+  background: #7a5833 !important;
+}
+body.light-beige .cust-amenity-item {
+  color: #6e675f !important;
+}
+body.light-beige .badge-inactive {
+  background: rgba(239, 68, 68, 0.15) !important;
+  color: #ef4444 !important;
+}
+body.light-beige .badge-active {
+  background: rgba(16, 185, 129, 0.15) !important;
+  color: #10b981 !important;
+}
+/* ============================================================
+   🌙 Additional Dark Mode Contrast Fixes
+   ============================================================ */
+
+/* Customer booking modal inputs — ensure readable placeholder */
+#cust-book-name::placeholder,
+#cust-book-phone::placeholder {
+  color: #6b6560;
+}
+
+/* Form label override for dark modal context — bump secondary to near-primary */
+#room-modal .form-label,
+#room-modal .form-row .form-label {
+  color: #b0bec8;
+}
+
+/* Room images gallery empty state is fixed in JS; add backup via CSS attribute */
+#room-images-visual-list span {
+  color: var(--text-secondary);
+}
+
+/* Customer header page — make subtitle text legible */
+#view-customer p[style*="text-muted"] {
+  color: var(--text-secondary) !important;
 }
 

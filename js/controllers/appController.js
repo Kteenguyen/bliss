@@ -178,6 +178,15 @@ function showToast(msg, type = 'info') {
 // ─── INIT ───────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   DB.init();
+  
+  // Apply saved theme
+  const settings = DB.getSettings();
+  if (settings.theme === 'light-beige') {
+    document.body.classList.add('light-beige');
+  } else {
+    document.body.classList.remove('light-beige');
+  }
+
   AppController.navigateTo('dashboard');
   AppController.setupSidebar();
   
@@ -199,6 +208,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('room-branch-filter')?.addEventListener('change', () => RoomsView.render());
   document.getElementById('booking-status-filter')?.addEventListener('change', () => BookingsView.render());
   document.getElementById('cust-branch-filter')?.addEventListener('change', () => CustomerView.render());
+  document.getElementById('cust-lang-selector')?.addEventListener('change', () => CustomerView.render());
 
   // Sync server on startup
   AppController.syncWithServer();

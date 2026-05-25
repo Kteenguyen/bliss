@@ -42,8 +42,11 @@ const CustomerController = {
     event.preventDefault();
     if (!activeCustRoom) return;
 
+    const lang = document.getElementById('cust-lang-selector')?.value || 'vi';
+    const trans = CUST_LANGS[lang] || CUST_LANGS.vi;
+
     if (selectedCustSlots.length === 0) {
-      showToast('⚠️ Vui lòng chọn ít nhất một khung giờ!', 'error');
+      showToast(lang === 'vi' ? '⚠️ Vui lòng chọn ít nhất một khung giờ!' : '⚠️ Please select at least one time slot!', 'error');
       return;
     }
 
@@ -51,7 +54,7 @@ const CustomerController = {
     const phone = document.getElementById('cust-book-phone').value.trim();
 
     if (!name || !phone) {
-      showToast('⚠️ Vui lòng điền đầy đủ tên và số điện thoại!', 'error');
+      showToast(lang === 'vi' ? '⚠️ Vui lòng điền đầy đủ tên và số điện thoại!' : '⚠️ Please fill in both your name and phone number!', 'error');
       return;
     }
 
@@ -81,13 +84,13 @@ const CustomerController = {
       num_guests: 2,
       total_price: totalPrice,
       status: 'confirmed',
-      special_requests: `Đặt giờ Dozy Home: Khung giờ [ ${slotsStr} ]`,
+      special_requests: lang === 'vi' ? `Đặt giờ Dozy Home: Khung giờ [ ${slotsStr} ]` : `Dozy Home Hourly Booking: Slots [ ${slotsStr} ]`,
       source: 'website'
     };
 
     const booking = DB.createBooking(bookingData);
     if (booking) {
-      showToast('🎉 Đặt phòng thành công! Lịch phòng đã được cập nhật.', 'success');
+      showToast(lang === 'vi' ? '🎉 Đặt phòng thành công! Lịch phòng đã được cập nhật.' : '🎉 Booking successful! Room calendar has been updated.', 'success');
       
       if (typeof NOTIFICATIONS !== 'undefined' && typeof NOTIFICATIONS.sendAlert === 'function') {
         NOTIFICATIONS.sendAlert(
@@ -104,7 +107,7 @@ const CustomerController = {
       BookingsView.render();
       DashboardView.render();
     } else {
-      showToast('❌ Đặt phòng không thành công, vui lòng thử lại.', 'error');
+      showToast(lang === 'vi' ? '❌ Đặt phòng không thành công, vui lòng thử lại.' : '❌ Booking failed, please try again.', 'error');
     }
   },
 
@@ -122,8 +125,11 @@ const CustomerController = {
   },
 
   generateCustDates() {
+    const lang = document.getElementById('cust-lang-selector')?.value || 'vi';
     const dates = [];
-    const daysOfWeek = ['Chủ Nhật', 'Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7'];
+    const daysOfWeekVi = ['Chủ Nhật', 'Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7'];
+    const daysOfWeekEn = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const daysOfWeek = lang === 'vi' ? daysOfWeekVi : daysOfWeekEn;
     const today = new Date();
     for (let i = 0; i < 7; i++) {
       const d = new Date();
@@ -131,7 +137,7 @@ const CustomerController = {
       const dateStr = d.toISOString().split('T')[0];
       
       let headerText = daysOfWeek[d.getDay()];
-      if (i === 0) headerText = 'Hôm nay';
+      if (i === 0) headerText = lang === 'vi' ? 'Hôm nay' : 'Today';
       
       const parts = dateStr.split('-');
       const bodyText = `${parts[2]}/${parts[1]}`;

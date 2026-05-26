@@ -17,8 +17,8 @@ console.log(`
 ============================================================
 `);
 
-// 1. Khởi chạy Máy chủ Chatbot v2.1
-const server = spawn('node', ['facebook-bot-server.js'], { shell: true });
+// 1. Khởi chạy Máy chủ Chatbot v3.0
+const server = spawn('node', ['server.js'], { shell: true });
 
 server.stdout.on('data', (data) => {
   process.stdout.write(data.toString());

@@ -59,6 +59,9 @@ const AppController = {
         if (serverSettings.bot_url && !localSettings.bot_url) {
           localSettings.bot_url = serverSettings.bot_url;
         }
+        if (serverSettings.webhook_chatbot && !localSettings.webhook_chatbot) {
+          localSettings.webhook_chatbot = serverSettings.webhook_chatbot;
+        }
         if (serverSettings.webhook_s06 && !localSettings.webhook_s06) {
           localSettings.webhook_s06 = serverSettings.webhook_s06;
         }

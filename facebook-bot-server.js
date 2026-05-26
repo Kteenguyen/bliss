@@ -233,33 +233,92 @@ function sendFacebookMessage(senderId, text) {
 }
 
 // --- XỬ LÝ TIN NHẮN NHẬN ĐƯỢC ---
+// --- XỬ LÝ TIN NHẮN QUA MAKE.COM GPT WEBHOOK (ĐỒNG BỘ) ---
 async function processIncomingMessage(senderId, messageText) {
-  console.log(`\n💬 Nhận tin nhắn từ khách hàng #${senderId}: "${messageText}"`);
+  console.log(`\n💬 [Make.com Mode] Nhận tin nhắn từ khách hàng #${senderId}: "${messageText}"`);
 
-  const session = getSession(senderId);
-  
-  // 1. Khôi phục trạng thái hội thoại của User này vào Sandbox
-  context.CHATBOT.state = session.state;
-  context.CHATBOT.context = session.context;
-  context.CHATBOT.history = session.history || [];
-
-  console.log(`📍 State trước xử lý: "${session.state}"`);
-
-  // 2. Chạy State Machine cốt lõi (hỏi thông tin, lọc phòng trống, chốt đơn)
+  // 1. Đọc link Make.com Webhook từ cài đặt (Settings)
+  let webhookUrl = '';
   try {
-    await context.CHATBOT.process(messageText, (text, role, type) => {
-      // Callback gửi tin nhắn ngược lại Facebook Messenger
-      sendFacebookMessage(senderId, text);
+    const settingsStr = mockLocalStorage.getItem('bliss_settings');
+    if (settingsStr) {
+      const settings = JSON.parse(settingsStr);
+      webhookUrl = settings.webhook_chatbot;
+    }
+  } catch (e) {
+    console.error('❌ Lỗi đọc settings từ database:', e.message);
+  }
+
+  // Nếu không có cấu hình webhook, thông báo cho người dùng
+  if (!webhookUrl) {
+    console.warn('⚠️ Chưa cấu hình Make.com Webhook URL - Chatbot (S01) trong cài đặt. Vui lòng cấu hình trên Web Admin!');
+    sendFacebookMessage(senderId, '⚠️ Hệ thống AI của Bliss Homestay hiện đang được bảo trì (Chưa cấu hình Make.com Webhook). Quý khách vui lòng liên hệ hotline để được hỗ trợ nhanh nhất!');
+    return;
+  }
+
+  console.log(`📡 Chuyển tiếp tin nhắn sang Make.com Webhook: ${webhookUrl}`);
+
+  // 2. Gửi request POST đồng bộ sang Make.com Webhook
+  const payload = JSON.stringify({
+    senderId: senderId,
+    messageText: messageText
+  });
+
+  try {
+    const parsedWebhook = new URL(webhookUrl);
+    const options = {
+      hostname: parsedWebhook.hostname,
+      port: parsedWebhook.port || (parsedWebhook.protocol === 'https:' ? 443 : 80),
+      path: parsedWebhook.pathname + parsedWebhook.search,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(payload)
+      }
+    };
+
+    const client = parsedWebhook.protocol === 'https:' ? https : http;
+
+    const req = client.request(options, (res) => {
+      let body = '';
+      res.on('data', chunk => body += chunk);
+      res.on('end', () => {
+        try {
+          console.log(`📥 Make.com phản hồi (${res.statusCode}):`, body);
+          let replyText = '';
+          
+          if (res.statusCode === 200) {
+            try {
+              const resData = JSON.parse(body);
+              replyText = resData.replyText || resData.message || body;
+            } catch (e) {
+              replyText = body; // Fallback nếu là chuỗi văn bản thuần
+            }
+          }
+
+          if (replyText && replyText.trim()) {
+            sendFacebookMessage(senderId, replyText);
+          } else {
+            console.warn('⚠️ Make.com phản hồi rỗng hoặc lỗi.');
+            sendFacebookMessage(senderId, 'Bliss Homestay đã nhận được thông tin và sẽ phản hồi quý khách sớm nhất!');
+          }
+        } catch (err) {
+          console.error('❌ Lỗi xử lý phản hồi từ Make.com:', err.message);
+          sendFacebookMessage(senderId, 'Bliss Homestay đã nhận được tin nhắn và sẽ phản hồi ngay lập tức!');
+        }
+      });
     });
 
-    // 3. Lưu lại trạng thái hội thoại mới sau khi xử lý xong
-    session.state = context.CHATBOT.state;
-    session.context = context.CHATBOT.context;
-    session.history = context.CHATBOT.history;
+    req.on('error', (e) => {
+      console.error('❌ Lỗi kết nối đến Make.com Webhook:', e.message);
+      sendFacebookMessage(senderId, 'Bliss Homestay đã nhận được thông tin. Đội ngũ CSKH sẽ liên hệ với quý khách ngay lập tức!');
+    });
 
-    console.log(`📍 State sau xử lý: "${session.state}"`);
-  } catch (err) {
-    console.error('❌ Lỗi trong luồng State Machine của Chatbot:', err);
+    req.write(payload);
+    req.end();
+  } catch (urlErr) {
+    console.error('❌ Định dạng Make.com Webhook URL không hợp lệ:', urlErr.message);
+    sendFacebookMessage(senderId, '⚠️ Hệ thống đang cấu hình lại kết nối AI. Quý khách vui lòng thử lại sau ít phút!');
   }
 }
 

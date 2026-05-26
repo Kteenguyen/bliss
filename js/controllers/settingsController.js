@@ -10,6 +10,7 @@ const SettingsController = {
       const fbPage = document.getElementById('settings-fb-pageid')?.value?.trim() || '';
       const fbToken = document.getElementById('settings-fb-token')?.value?.trim() || '';
       const botUrl = document.getElementById('settings-bot-url')?.value?.trim() || 'http://localhost:3000';
+      const chatbot = document.getElementById('settings-webhook-chatbot')?.value?.trim() || '';
       const s06 = document.getElementById('settings-webhook-s06')?.value?.trim() || '';
       const s07 = document.getElementById('settings-webhook-s07')?.value?.trim() || '';
       const s08 = document.getElementById('settings-webhook-s08')?.value?.trim() || '';
@@ -21,6 +22,7 @@ const SettingsController = {
         fb_pageid: fbPage,
         fb_token: fbToken,
         bot_url: botUrl,
+        webhook_chatbot: chatbot,
         webhook_s06: s06,
         webhook_s07: s07,
         webhook_s08: s08,
